@@ -185,12 +185,12 @@
                                         <p class="model-description">Advanced, for complex reasoning.</p>
                                     </div>
                                 </a>
-                                <a href="#" data-model="MDLLM 2.5 Reserach" data-icon="hub">
+                                <a href="#" data-model="MDLLM 2.5 Research" data-icon="hub">
                                     <div class="model-icon-container">
                                          <span class="material-symbols-rounded model-icon">hub</span>
                                     </div>
                                     <div class="model-info">
-                                        <span class="model-name">MDLLM 2.5 <b>Reserach</b></span>
+                                        <span class="model-name">MDLLM 2.5 <b>Research</b></span>
                                         <p class="model-description">Strongest, for difficult analysis.</p>
                                     </div>
                                 </a>
@@ -1378,23 +1378,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let controller;
     let currentChat = { history: [] };
-    let selectedModel = 'Gemini 2.5 Flash'; // Default model
+    let selectedModel = 'Madeon 1.5 Flash'; // Default model // Default model
     let attachedFile = null; // To store file data
 
-    // --- API Configuration ---
+// --- API Configuration ---
     const GEMINI_API_KEY = "AIzaSyDhkuCMhPJPeRJGq6BnqtvJfqlHu71Nob8";
     const PERPLEXITY_API_KEY = "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"; 
     
     const API_ENDPOINTS = {
-        'Gemini 2.5 Flash': `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-        'Gemini 2.5 Pro': `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`,
-        'Perplexity Sonar': 'https://api.perplexity.ai/chat/completions',
-        'Perplexity Sonar Pro': 'https://api.perplexity.ai/chat/completions'
+        'Madeon 1.5 Flash': `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+        'Madeon 1.5 Pro': `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`,
+        'MDLLM 2.5 Research': 'https://api.perplexity.ai/chat/completions',
+        'MDLLM Research Pro': 'https://api.perplexity.ai/chat/completions'
     };
     
    const PERPLEXITY_MODELS = {
-        'Perplexity Sonar': 'sonar',
-        'Perplexity Sonar Pro': 'sonar-pro'
+        'MDLLM 2.5 Research': 'sonar',
+        'MDLLM Research Pro': 'sonar-pro'
     };
 
     // --- ADDED: Global, flexible regex for image prompt detection & cleaning ---
@@ -2075,14 +2075,22 @@ const createNewBotMessage = () => {
         e.preventDefault();
         const link = e.target.closest('a');
         if (link) {
+            // This is correct: store the plain text key for the API
             selectedModel = link.dataset.model;
             const selectedIcon = link.dataset.icon;
+
+            // --- FIX ---
+            // 1. Get the HTML content from the dropdown item
+            const modelNameHTML = link.querySelector('.model-name').innerHTML;
+            // 2. Set the button's innerHTML to render the <b> tags
+            selectedModelName.innerHTML = modelNameHTML;
+            // --- END FIX ---
             
-            selectedModelName.textContent = selectedModel;
             selectedModelIcon.textContent = selectedIcon;
             
             modelDropdownContent.classList.remove('show');
-            showToast(`${selectedModel} selected!`);
+            // Use the plain text for the toast notification
+            showToast(`${link.querySelector('.model-name').textContent.trim()} selected!`);
         }
     });
 
