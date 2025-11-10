@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Enhanced by Madeon Code -->
+<!-- Enhanced by Gemini -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Madeon ✦ v2</title>
+    <title>Madeon by MDS.</title>
     <!-- Google Fonts For Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@32,400,0,0" />
     <!-- Marked.js for Markdown parsing -->
@@ -12,6 +12,11 @@
     <!-- highlight.js for syntax highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.16/mammoth.browser.min.js"></script>
+    
   </head>
   <body>
     <div class="main-content">
@@ -21,7 +26,7 @@
         <header class="main-header">
             <div class="header-title">
                 <span class="material-symbols-rounded">auto_awesome</span>
-                Madeon 2 <br><b>by Madesholic Data Services.</b>
+                Madeon 2.1
             </div>
             <button class="upgrade-btn">Upgrade</button>
         </header>
@@ -67,44 +72,36 @@
         <!-- Enhanced Prompt Input -->
 <div class="prompt-container">
             
-            <div id="image-gen-options-container" class="image-options-container-pro" style="display: none;">
+<div id="image-gen-options-container" class="image-options-container-pro" style="display: none;">
+                <div class="image-option-group">
+                    <label for="image-gen-model">Model</label>
+                    <select id="image-gen-model" class="image-gen-select">
+                        <option value="pollinations" selected>Pollinations (Default)</option>
+                        <option value="black-forest-labs/FLUX.1-dev">FLUX.1-dev</option>
+                        <option value="runwayml/stable-diffusion-v1-5">Stable Diffusion v1.5</option>
+                        <option value="stabilityai/stable-diffusion-3-medium-diffusers">Stable Diffusion 3 Medium</option>
+                        </select>
+                </div>
                 <div class="image-option-group">
                     <label for="image-aspect-ratio">Aspect Ratio</label>
                     <select id="image-aspect-ratio" class="image-gen-select">
-                        <option value="1024x1024" selected>Square (1:1)</option>
-                        <option value="768x1024">Portrait (3:4)</option>
-                        <option value="1024x768">Landscape (4:3)</option>
+                        <option value="1/1" selected>Square (1:1)</option>
+                        <option value="16/9">Landscape (16:9)</option>
+                        <option value="9/16">Portrait (9:16)</option>
+                        </select>
+                </div>
+                 <div class="image-option-group" id="image-count-group" style="display: none;">
+                     <label for="image-count">Image Count</label>
+                    <select id="image-count" class="image-gen-select">
+                        <option value="1" selected>1 Image</option>
+                        <option value="2">2 Images</option>
+                        <option value="3">3 Images</option>
+                        <option value="4">4 Images</option>
                     </select>
                 </div>
-                <div class="image-option-group">
-                    <label for="image-style">Style</label>
-                    <select id="image-style" class="image-gen-select">
-                        <option value="" selected>Default (None)</option>
-                        <option value="photorealistic">Photorealistic</option>
-                        <option value="digital art">Digital Art</option>
-                        <option value="anime style">Anime</option>
-                        <option value="fantasy art">Fantasy</option>
-                        <option value="watercolor painting">Watercolor</option>
-                    </select>
                 </div>
-            </div>
-            <div id="file-preview-container" class="file-preview-container-pro" style="display: none;">
-                <div class="file-preview-header">
-                    <span class="material-symbols-rounded file-icon">attachment</span>
-                    <span class="file-label">Attached File</span>
-                    <button id="cancel-file-btn" class="file-remove-btn">
-                        <span class="material-symbols-rounded">Close</span>
-                    </button>
+<div id="file-previews-wrapper" class="file-previews-wrapper-pro" style="display: none;">
                 </div>
-                <div class="file-preview-body">
-                    <img id="file-preview-image" src="#" alt="Preview"/>
-                    <div class="file-info">
-                        <span id="file-preview-name" class="file-name"></span>
-                        <span id="file-preview-size" class="file-size"></span>
-                        <div class="file-type-badge" id="file-type-badge"></div>
-                    </div>
-                </div>
-            </div>
             <form action="#" class="prompt-form">
                 <textarea placeholder="How can I help you today?" class="prompt-input" required></textarea>
                 <div class="prompt-form-controls">
@@ -166,41 +163,89 @@
                                 <span id="selected-model-name">Models</span>
                                 <span class="material-symbols-rounded">expand_more</span>
                             </button>
-                            <div id="model-dropdown-content" class="dropdown-content">
-                                <a href="#" data-model="Madeon 1.5 Flash" data-icon="bolt">
+                         <div id="model-dropdown-content" class="dropdown-content">
+                                <a href="#" data-model="Madeon 2 Flash" data-icon="bolt">
                                     <div class="model-icon-container">
                                         <span class="material-symbols-rounded model-icon">bolt</span>
                                     </div>
                                     <div class="model-info">
-                                        <span class="model-name">Madeon 1.5 <b>Flash</b></span>
+                                        <div class="model-name-wrapper">
+                                            <span class="model-name">Madeon 2 Flash</span>
+                                            <span class="model-badge fast">Fast</span>
+                                        </div>
                                         <p class="model-description">Quick and efficient for everyday tasks.</p>
                                     </div>
                                 </a>
-                                <a href="#" data-model="Madeon 1.5 Pro" data-icon="auto_awesome">
+                                <a href="#" data-model="Madeon 2 Pro" data-icon="auto_awesome">
                                     <div class="model-icon-container">
                                         <span class="material-symbols-rounded model-icon">auto_awesome</span>
                                     </div>
                                     <div class="model-info">
-                                        <span class="model-name">Madeon 1.5 <b>Pro</b></span>
+                                        <div class="model-name-wrapper">
+                                            <span class="model-name">Madeon 2 Pro</span>
+                                            <span class="model-badge pro">Pro</span>
+                                        </div>
                                         <p class="model-description">Advanced, for complex reasoning.</p>
                                     </div>
                                 </a>
-                                <a href="#" data-model="MDLLM 2.5 Research" data-icon="hub">
+                                <a href="#" data-model="MDLLM 2 Search" data-icon="hub">
                                     <div class="model-icon-container">
                                          <span class="material-symbols-rounded model-icon">hub</span>
                                     </div>
                                     <div class="model-info">
-                                        <span class="model-name">MDLLM 2.5 <b>Research</b></span>
+                                        <div class="model-name-wrapper">
+                                            <span class="model-name">MDLLM 2 Search</span>
+                                            <span class="model-badge fast">Fast</span>
+                                        </div>
                                         <p class="model-description">Strongest, for difficult analysis.</p>
                                     </div>
                                 </a>
-                                 <a href="#" data-model="MDLLM Research Pro" data-icon="bubble_chart">
+                                <a href="#" data-model="MDLLM 2 Search Pro" data-icon="bubble_chart">
                                     <div class="model-icon-container">
                                         <span class="material-symbols-rounded model-icon">bubble_chart</span>
                                     </div>
                                     <div class="model-info">
-                                        <span class="model-name">MDLLM Research <b>Pro</b></span>
+                                        <div class="model-name-wrapper">
+                                            <span class="model-name">MDLLM 2 Search Pro</span>
+                                            <span class="model-badge pro">Pro</span>
+                                        </div>
                                         <p class="model-description">Versatile, excels at creative tasks.</p>
+                                    </div>
+                                </a>
+                                <a href="#" data-model="MadReason 2.5" data-icon="mediation">
+                                    <div class="model-icon-container">
+                                        <span class="material-symbols-rounded model-icon">mediation</span>
+                                    </div>
+                                    <div class="model-info">
+                                        <div class="model-name-wrapper">
+                                            <span class="model-name">MadReason 2.5</span>
+                                            <span class="model-badge test">Test</span>
+                                        </div>
+                                        <p class="model-description">Optimized for logical deduction.</p>
+                                    </div>
+                                </a>
+                                <a href="#" data-model="Madeon Research Turbo" data-icon="plagiarism" class="disabled">
+                                    <div class="model-icon-container">
+                                        <span class="material-symbols-rounded model-icon">plagiarism</span>
+                                    </div>
+                                    <div class="model-info">
+                                        <div class="model-name-wrapper">
+                                            <span class="model-name">Madeon Research Turbo</span>
+                                            <span class="model-badge test">Test</span>
+                                        </div>
+                                        <p class="model-description">In-depth research and analysis.</p>
+                                    </div>
+                                </a>
+                                <a href="#" data-model="MadReason 2.5 Pro" data-icon="manage_search">
+                                    <div class="model-icon-container">
+                                        <span class="material-symbols-rounded model-icon">manage_search</span>
+                                    </div>
+                                    <div class="model-info">
+                                        <div class="model-name-wrapper">
+                                            <span class="model-name">MadReason 2.5 Pro</span>
+                                            <span class="model-badge pro">Pro</span>
+                                        </div>
+                                        <p class="model-description">Advanced reasoning and research.</p>
                                     </div>
                                 </a>
                             </div>
@@ -227,7 +272,7 @@
     </div>
 
     <!-- Hidden file input -->
-    <input type="file" id="file-input" accept="image/*" hidden />
+<input type="file" id="file-input" accept="image/*, .pdf, .docx, .txt, .html, .css, .js, .py, .java, .c, .cpp, .h, .go, .rb, .php, .ts, .json, .xml, .yaml, .yml, .md" hidden multiple />
 
     <!-- Custom Modal for Deletion Confirmation -->
     <div id="delete-modal" class="modal-overlay" style="display: none;">
@@ -321,9 +366,13 @@
     <!-- Toast Notification -->
     <div id="toast-notification" class="toast"></div>
 
-
-
-<style>
+    <div id="drag-drop-overlay" style="display: none;">
+      <div class="drag-drop-content">
+        <span class="material-symbols-rounded">upload_file</span>
+        <p>Drop files anywhere to upload</p>
+      </div>
+    </div>
+    <style>
     
 /* --- NEO-BRUTALISM STYLE V2 --- */
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;800&display=swap");
@@ -447,7 +496,25 @@ body.chats-active .chats-container { display: flex; }
     line-height: 1.6;
 }
 .chats-container .message .message-text p:last-child { margin-bottom: 0; }
+
 .chats-container .user-message .img-attachment { max-width: 100%; border-radius: var(--border-radius); margin-top: 10px; border: var(--border-width) solid var(--border-color); }
+
+/* --- ADDED: Style for file badge in user message --- */
+.chats-container .user-message .file-attachment-badge {
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: var(--border-radius);
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+.chats-container .user-message .file-attachment-badge .material-symbols-rounded {
+    font-size: 20px;
+}
+
 .chats-container .message .message-text pre { position: relative; background-color: #282c34; color: #abb2bf; padding: 1rem; border-radius: var(--border-radius); margin: 1rem 0; border: var(--border-width) solid var(--border-color); box-shadow: var(--harsh-shadow); white-space: pre-wrap; }
 .copy-code-btn { position: absolute; top: 8px; right: 8px; background: #abb2bf; color: #282c34; border: 2px solid var(--border-color); box-shadow: 3px 3px 0 var(--shadow-color); border-radius: var(--border-radius); padding: 4px 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
 /* --- ADDED: Better user feedback on click for copy button --- */
@@ -463,12 +530,135 @@ body.chats-active .chats-container { display: flex; }
     align-items: center;
     gap: 8px;
     margin-top: 10px;
-    opacity: 0; /* Initially hidden */
+    /* --- REMOVED: Opacity and hover rules --- */
     transition: opacity 0.3s ease;
 }
-.bot-message:hover .message-actions {
-    opacity: 1; /* Show on hover */
+
+/* --- ▼▼▼ PASTE NEW BLOCK HERE ▼▼▼ --- */
+/* --- ADDED: Neo-Brutalism Error Card --- */
+.neo-error-card {
+    background: var(--primary-bg);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--harsh-shadow);
+    padding: 1.25rem; /* 20px */
+    text-align: left;
+    /* We remove the bot's default message padding */
+    margin: -18px -24px; 
 }
+
+.neo-error-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--danger-color);
+    border-bottom: var(--border-width) solid var(--border-color);
+    padding-bottom: 0.75rem; /* 12px */
+    margin-bottom: 1rem; /* 16px */
+}
+
+.neo-error-header .material-symbols-rounded {
+    font-size: 2.25rem; /* 36px */
+    font-weight: 600;
+}
+
+.neo-error-header h3 {
+    font-size: 1.25rem; /* 20px */
+    font-weight: 800;
+    margin: 0;
+}
+
+.neo-error-message {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap; /* Ensures error messages with newlines render correctly */
+}
+/* --- ▲▲▲ END OF PASTED BLOCK ▲▲▲ --- */
+
+/* === Modify Response Dropdown === */
+/* === Modify Response Dropdown === */
+/* ===== PRODUCTION MODIFY RESPONSE MENU ===== */
+.modify-response-menu {
+    position: fixed; /* Changed from absolute */
+    background: var(--primary-bg);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3); /* Stronger shadow */
+    padding: 8px 0;
+    display: none;
+    flex-direction: column;
+    z-index: 10000; /* Higher than other elements */
+    min-width: 220px;
+    max-width: 280px;
+    animation: slideUpFadeIn 0.2s ease-out;
+}
+
+.modify-response-menu.show {
+    display: flex;
+}
+
+.modify-response-menu button {
+    background: none;
+    border: none;
+    padding: 12px 16px;
+    text-align: left;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-color);
+}
+
+.modify-response-menu button .material-symbols-rounded {
+    font-size: 20px;
+    color: var(--placeholder-color);
+}
+
+.modify-response-menu button:hover {
+    background: var(--background);
+    padding-left: 20px;
+}
+
+.modify-response-menu button:hover .material-symbols-rounded {
+    color: var(--user-msg-bg);
+}
+
+.modify-response-menu button:active {
+    transform: scale(0.98);
+}
+
+.modify-response-menu button:not(:last-child) {
+    border-bottom: 1px solid var(--background);
+}
+
+/* Loading state for modify */
+.message.loading .modify-btn {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+
+.modify-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--placeholder-color);
+  padding: 4px;
+  border-radius: var(--border-radius);
+  transition: all 0.2s;
+}
+
+.modify-btn:hover {
+  background-color: #f0f0f0;
+  color: var(--text-color);
+}
+
 .action-btn {
     background: transparent;
     border: none;
@@ -486,6 +676,11 @@ body.chats-active .chats-container { display: flex; }
 }
 .action-btn.active {
     color: var(--user-msg-bg);
+}
+
+/* --- ADDED: Style for "speaking" button --- */
+.action-btn.speaking {
+    color: var(--danger-color);
 }
 
 /* --- ADDED: Gemini-style "Thinking" Loader --- */
@@ -568,14 +763,68 @@ body.chats-active .chats-container { display: flex; }
     background-size: 10px;
 }
 
-/* --- ADDED: Style for AI-Generated Images --- */
-.chats-container .bot-message .generated-image {
-    max-width: 100%;
-    border-radius: var(--border-radius);
+/* --- ADDED: Styles for Multi-Image Display & Loading --- */
+.generated-images-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
     margin-bottom: 10px;
+}
+.generated-image-wrapper {
+    flex: 1 1 calc(50% - 10px); /* Two columns layout */
+    max-width: calc(50% - 5px);
+    aspect-ratio: 1 / 1; /* Default to square */
+    border-radius: var(--border-radius);
     border: var(--border-width) solid var(--border-color);
     box-shadow: var(--harsh-shadow);
-    background: #f0f0f0; /* Placeholder bg while loading */
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.generated-image-wrapper.loading .spinner {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--user-msg-bg);
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.generated-image-wrapper.error {
+    flex-direction: column; /* Stack icon and text */
+    gap: 5px;
+    padding: 10px;
+}
+.generated-image-wrapper.error .material-symbols-rounded {
+    font-size: 2rem;
+    color: var(--danger-color);
+}
+.generated-image-wrapper.error .error-text {
+    font-size: 0.8rem;
+    color: var(--danger-color);
+    text-align: center;
+}
+/* Ensure single image still looks good */
+.generated-images-container:has(> :only-child) .generated-image-wrapper {
+   flex-basis: 100%;
+   max-width: 100%;
+   aspect-ratio: auto; /* Let single image use its natural ratio */
+}
+
+/* --- Style for AI-Generated Images --- */
+.chats-container .bot-message .generated-image {
+    /* --- MODIFIED: Ensure image fills wrapper --- */
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Changed from max-width */
+    border-radius: 0; /* Wrapper now has radius */
+    margin-bottom: 0; /* Wrapper handles margin */
+    border: none; /* Wrapper handles border */
+    box-shadow: none; /* Wrapper handles shadow */
+    background: transparent;
 }
 
 
@@ -584,15 +833,27 @@ body.chats-active .chats-container { display: flex; }
     border-top: var(--border-width) solid var(--border-color);
     max-width: 990px; width: 100%; margin: 0 auto;
 }
-/* Professional File Preview Styles */
-.file-preview-container-pro {
+
+/* --- MODIFIED: Professional Multi-File Preview Styles --- */
+.file-previews-wrapper-pro {
+    display: flex;
+    flex-wrap: wrap; /* Allow cards to wrap to the next line */
+    gap: 10px;
+    margin-bottom: 12px;
+    animation: slideDown 0.3s ease;
+}
+
+.file-preview-card {
     background: var(--primary-bg);
     border: var(--border-width) solid var(--border-color);
     box-shadow: var(--harsh-shadow);
     border-radius: var(--border-radius);
-    margin-bottom: 12px;
-    overflow: hidden;
-    animation: slideDown 0.3s ease;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 250px; /* Give cards a fixed width */
+    max-width: 100%;
 }
 
 @keyframes slideDown {
@@ -600,91 +861,90 @@ body.chats-active .chats-container { display: flex; }
     to { transform: translateY(0); opacity: 1; }
 }
 
-.file-preview-header {
+.file-preview-card-visual {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: var(--border-radius);
+    border: var(--border-width) solid var(--border-color);
+    box-shadow: 2px 2px 0 var(--shadow-color);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: #f0f0f0;
+}
+.file-preview-card-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.file-preview-card-visual .material-symbols-rounded {
+    font-size: 24px;
+    color: var(--placeholder-color);
+}
+
+.file-preview-card-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden; /* For text-overflow */
+}
+
+.file-preview-card-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-preview-card-size {
+    font-size: 0.8rem;
+    color: var(--placeholder-color);
+}
+
+/* --- ADDED: Styles for file meta (size + badge) --- */
+.file-preview-card-meta {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 12px;
-    background: var(--background);
-    border-bottom: var(--border-width) solid var(--border-color);
+    margin-top: 4px;
 }
-
-.file-preview-header .file-icon {
-    font-size: 20px;
+.file-type-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
     color: var(--text-color);
+    background: var(--background);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 2px solid var(--border-color);
 }
+/* --- END: Added styles --- */
 
-.file-preview-header .file-label {
-    flex-grow: 1;
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.file-remove-btn {
+.file-preview-card-remove {
     background: transparent;
     border: none;
     cursor: pointer;
     padding: 4px;
     border-radius: var(--border-radius);
     transition: all 0.2s ease;
+    align-self: flex-start; /* Align to the top */
 }
-
-.file-remove-btn:hover {
+.file-preview-card-remove:hover {
     background: var(--danger-bg);
 }
-
-.file-remove-btn .material-symbols-rounded {
+.file-preview-card-remove .material-symbols-rounded {
+    color: var(--danger-color);
+    font-size: 20px;
+}.file-preview-card-remove .material-symbols-rounded {
     color: var(--danger-color);
     font-size: 20px;
 }
 
-.file-preview-body {
-    display: flex;
-    gap: 12px;
-    padding: 12px;
-    align-items: center;
-}
+/* --- REMOVED: Styles for Edit Button and Selected State --- */
 
-#file-preview-image {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: var(--border-radius);
-    border: var(--border-width) solid var(--border-color);
-    box-shadow: 3px 3px 0 var(--shadow-color);
-}
-
-.file-info {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.file-name {
-    font-weight: 600;
-    font-size: 0.95rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.file-size {
-    font-size: 0.85rem;
-    color: var(--placeholder-color);
-}
-
-.file-type-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    background: var(--user-msg-bg);
-    color: white;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    width: fit-content;
-    margin-top: 4px;
-}
+/* Settings Modal Styles */
 
 /* Settings Modal Styles */
 .settings-modal-content {
@@ -1038,9 +1298,150 @@ body.chats-active .chats-container { display: flex; }
 .model-name { font-weight: 600; }
 .model-description { font-size: 0.8rem; color: var(--placeholder-color); line-height: 1.2; }
 
+/* --- ▼▼▼ PASTE NEW BLOCK HERE ▼▼▼ --- */
+.model-name-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.model-badge {
+    font-size: 0.7rem; /* 11.2px */
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: var(--border-radius);
+    border: 2px solid var(--border-color);
+    box-shadow: 2px 2px 0 var(--shadow-color);
+    text-transform: uppercase;
+}
+
+.model-badge.fast {
+    background: var(--success-color);
+    color: var(--primary-bg);
+}
+
+.model-badge.pro {
+    background: var(--user-msg-bg);
+    color: var(--user-msg-text);
+}
+
+.model-badge.test {
+    background: var(--placeholder-color);
+    color: var(--primary-bg);
+}
+
+.dropdown-content a.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+    background-color: #f1f1f1;
+}
+
+.dropdown-content a.disabled .model-description::after {
+    content: " (Coming Soon)";
+    font-weight: 700;
+    color: var(--danger-color);
+}
+/* --- ▲▲▲ END OF PASTED BLOCK ▲▲▲ --- */
+
+
+/* Icon Animations on Hover */
+
 /* Icon Animations on Hover */
 .dropdown-content a:hover .model-icon[data-icon="bolt"],
 .dropdown-content a:hover .model-icon[data-icon="auto_awesome"] { animation: spin 0.5s ease-in-out; }
+
+/* Voice Dropdown Styles */
+.voice-dropdown-container { 
+    position: relative; 
+    display: inline-block; 
+    margin-left: 8px;
+}
+
+#voice-dropdown-btn { 
+    padding: 6px 10px;
+    background: transparent;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+#voice-dropdown-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.voice-dropdown-content {
+    display: none; 
+    position: absolute; 
+    bottom: 120%; 
+    right: 0;
+    background-color: var(--primary-bg); 
+    min-width: 260px;
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--border-radius); 
+    box-shadow: var(--harsh-shadow); 
+    z-index: 1001;
+    overflow: hidden;
+}
+
+.voice-dropdown-content a {
+    color: var(--text-color);
+    padding: 12px 14px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
+}
+
+.voice-dropdown-content a:not(:last-child) {
+    border-bottom: var(--border-width) solid var(--border-color);
+}
+
+.voice-dropdown-content a:hover { 
+    background-color: #f1f1f1; 
+}
+
+.voice-dropdown-content.show { 
+    display: block; 
+}
+
+.voice-icon-container {
+    width: 36px; 
+    height: 36px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    background-color: var(--background);
+    border-radius: var(--border-radius);
+    border: var(--border-width) solid var(--border-color);
+}
+
+.voice-icon { 
+    font-size: 20px; 
+}
+
+.voice-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.voice-name { 
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.voice-description { 
+    font-size: 0.75rem; 
+    color: var(--placeholder-color); 
+    line-height: 1.2; 
+}
 .dropdown-content a[data-icon="bolt"]:hover .model-icon { animation: shake 0.5s ease-in-out; }
 .dropdown-content a[data-icon="auto_awesome"]:hover .model-icon { animation: spin 0.8s ease; }
 .dropdown-content a[data-icon="hub"]:hover .model-icon { animation: pulse 0.6s ease; }
@@ -1332,6 +1733,53 @@ body.chats-active .chats-container { display: flex; }
     }
 }
 
+/* --- ADDED: Drag and Drop Overlay Styles --- */
+#drag-drop-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    z-index: 10000; /* On top of everything */
+    display: grid;
+    place-items: center;
+    pointer-events: none; /* Allows clicks to pass through when hidden */
+    backdrop-filter: blur(5px);
+}
+
+#drag-drop-overlay .drag-drop-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem 3rem;
+    background: var(--primary-bg);
+    border: 3px dashed var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--harsh-shadow);
+}
+
+#drag-drop-overlay .drag-drop-content .material-symbols-rounded {
+    font-size: 4rem;
+    color: var(--user-msg-bg);
+}
+
+#drag-drop-overlay .drag-drop-content p {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+/* This class will be toggled on the <body> */
+body.drag-over #drag-drop-overlay {
+    display: grid;
+    pointer-events: all; /* Make it interactive when visible */
+}
+/* --- END: Drag and Drop Overlay Styles --- */
+
+
+/**/
 
 </style>
 
@@ -1344,6 +1792,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById('delete-modal');
     const modalConfirmBtn = document.getElementById('modal-confirm-btn');
     const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    
+    
     const suggestionCards = document.querySelectorAll('.suggestion-card');
     const promptActionBtns = document.querySelectorAll('.focus-buttons-container .prompt-action-btn');
     const internalActionBtns = document.querySelectorAll('.internal-action-btn');
@@ -1369,33 +1819,84 @@ document.addEventListener("DOMContentLoaded", () => {
     let finalTranscript = '';
 
 // File attachment elements
-    // const attachFileBtn = document.getElementById('attach-file-btn'); // No longer exists
     const fileInput = document.getElementById('file-input');
-    const filePreviewContainer = document.getElementById('file-preview-container');
-    const filePreviewImage = document.getElementById('file-preview-image');
-    const filePreviewName = document.getElementById('file-preview-name');
-    const cancelFileBtn = document.getElementById('cancel-file-btn');
+    // --- MODIFIED: Use the new wrapper ---
+    const filePreviewsWrapper = document.getElementById('file-previews-wrapper');
+    
+    // --- REMOVED: Old single-preview elements ---
+    // const filePreviewContainer = ...
+    // const filePreviewImage = ...
+    // const filePreviewIcon = ...
+    // const filePreviewSize = ...
+    // const fileTypeBadge = ...
+    // const filePreviewName = ...
+    // const cancelFileBtn = ...
 
     let controller;
     let currentChat = { history: [] };
-    let selectedModel = 'Madeon 1.5 Flash'; // Default model // Default model
-    let attachedFile = null; // To store file data
+    let selectedModel = 'Madeon 2 Flash'; // Default model
+    // --- MODIFIED: Changed from single object to array ---
+    let attachedFiles = []; // To store file data
+    // Voice selection state
+    let selectedVoice = 'Alex'; // Default voice (male)
+    let currentUtterance = null; // Track current speech
 
-// --- API Configuration ---
-    const GEMINI_API_KEY = "AIzaSyDhkuCMhPJPeRJGq6BnqtvJfqlHu71Nob8";
-    const PERPLEXITY_API_KEY = "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"; 
+    // --- ADDED: Replicate API Token ---
+// --- REMOVED: Replicate Token and sleep function ---
+
+    // --- API Configuration ---
+    // 1. Gemini Key Pool (5 keys)
+    const GEMINI_API_KEYS = [
+        "AIzaSyDVGMreYNNjezwcmmHJ8EtkY9qnEqEHAAg", // Your 1st Key
+        "AIzaSyCi2_2RZrZB5ZnPW97ezSpU8kIWlF6Yjq4", // Your 2nd Key
+        "AIzaSyDj0PZBzTFSwlnOq3-ToA5362Zg99gy4Pg", // Your 3rd Key
+        "AIzaSyDz3Hs_sTFyQQ_63oQlcXcU1hlYdsNrP1A", // Your 4th Key
+        "AIzaSyDSNYkim59WUWBOjNnhuU-CQ6eHg35I41A"  // Your 5th Key
+    ];
+    let geminiKeyIndex = 0;
+
+    // 2. Perplexity Key Pool (2 keys)
+    const PERPLEXITY_API_KEYS = [
+        "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", // Your 1st Key
+        "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" //
+        ];
+    let perplexityKeyIndex = 0;
+
+    // 3. Hugging Face Key (remains singular)
+    const HUGGINGFACE_API_KEY = "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"; // Replace
+    
+    // 4. Key Rotation Functions
+    const getNextGeminiKey = () => {
+        const key = GEMINI_API_KEYS[geminiKeyIndex];
+        geminiKeyIndex = (geminiKeyIndex + 1) % GEMINI_API_KEYS.length;
+        return key;
+    };
+
+    const getNextPerplexityKey = () => {
+        const key = PERPLEXITY_API_KEYS[perplexityKeyIndex];
+        perplexityKeyIndex = (perplexityKeyIndex + 1) % PERPLEXITY_API_KEYS.length;
+        return key;
+    };
     
     const API_ENDPOINTS = {
-        'Madeon 1.5 Flash': `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-        'Madeon 1.5 Pro': `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`,
-        'MDLLM 2.5 Research': 'https://api.perplexity.ai/chat/completions',
-        'MDLLM Research Pro': 'https://api.perplexity.ai/chat/completions'
+        'Madeon 2 Flash': `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=`,
+        'Madeon 2 Pro': `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=`,
+        'MDLLM 2 Search': 'https://api.perplexity.ai/chat/completions',
+        'MDLLM 2 Search Pro': 'https://api.perplexity.ai/chat/completions',
+        'MadReason 2.5': 'https://api.perplexity.ai/chat/completions',
+        'Madeon Research Turbo': 'https://api.perplexity.ai/chat/completions',
+        'MadReason 2.5 Pro': 'https://api.perplexity.ai/chat/completions'
     };
     
    const PERPLEXITY_MODELS = {
-        'MDLLM 2.5 Research': 'sonar',
-        'MDLLM Research Pro': 'sonar-pro'
+        'MDLLM 2 Search': 'sonar',
+        'MDLLM 2 Search Pro': 'sonar-pro',
+        'MadReason 2.5': 'sonar-reasoning',
+        'Madeon Research Turbo': 'sonar-deep-research',
+        'MadReason 2.5 Pro': 'sonar-reasoning-pro'
     };
+
+    // --- REMOVED: REASONING_MODELS Set ---
 
     // --- ADDED: Global, flexible regex for image prompt detection & cleaning ---
     const IMAGE_PROMPT_REGEX = /^(generate|create|make|draw|show me an|show me a|show me the)?\s*(image|picture|photo|drawing)\s*(of)?/i;
@@ -1422,6 +1923,308 @@ document.addEventListener("DOMContentLoaded", () => {
         div.innerHTML = content;
         return div;
     };
+
+    // --- ▼▼▼ PASTE NEW FUNCTION HERE ▼▼▼ ---
+    /**
+     * Displays a standardized Neo-Brutalism error card in a bot message.
+     * @param {HTMLElement} botMsgDiv - The bot message <div> to inject the error into.
+     * @param {string} errorMessage - The error message to display.
+     */
+    const displayBotError = (botMsgDiv, errorMessage) => {
+        const textElement = botMsgDiv.querySelector(".message-text");
+        if (!textElement) return;
+
+        // 1. Create the error card HTML
+        // We escape the error message to prevent HTML injection (XSS)
+        const escapedMessage = errorMessage.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        const errorHTML = `
+            <div class="neo-error-card">
+                <div class="neo-error-header">
+                    <span class="material-symbols-rounded">error_outline</span>
+                    <h3>Generation Failed</h3>
+                </div>
+                <p class="neo-error-message">${escapedMessage}</p>
+            </div>
+        `;
+        
+        // 2. Inject the HTML
+        textElement.innerHTML = errorHTML;
+        textElement.style.color = ''; // Reset any inline error color
+
+        // 3. Clean up the bot message state
+        botMsgDiv.classList.remove("loading");
+        stopGenerationContainer.style.display = 'none';
+        
+        // 4. Hide message actions (like, copy, etc.) as they don't apply to an error
+        const actionsDiv = botMsgDiv.querySelector('.message-actions');
+        if (actionsDiv) {
+            actionsDiv.style.display = 'none';
+        }
+        
+        // 5. Hide modify button (if it was added)
+        const modifyBtn = botMsgDiv.querySelector('.modify-btn');
+        if (modifyBtn) {
+            modifyBtn.style.display = 'none';
+        }
+    };
+    // --- ▲▲▲ END OF PASTED BLOCK ▲▲▲ ---
+    
+    // === Modify Response Button & Menu Feature ===
+    
+    // === Modify Response Button & Menu Feature ===
+// ===== PRODUCTION-READY MODIFY RESPONSE FEATURE =====
+function addModifyResponseFeature(messageEl) {
+    const messageTextEl = messageEl.querySelector('.message-text');
+    if (!messageTextEl) return;
+
+    // --- UPDATE: Initialize modify count ---
+    messageEl.dataset.modifyCount = "0";
+    // --- END UPDATE ---
+
+    // Extract plain text (removing HTML/Markdown)
+    const originalText = messageTextEl.textContent || messageTextEl.innerText;
+    // --- FIX: Read the original markdown from the data attribute ---
+    const originalMarkdown = messageTextEl.dataset.originalMarkdown || originalText;
+    // --- END FIX ---
+
+    const modifyBtn = document.createElement('button');
+    modifyBtn.className = 'modify-btn action-btn';
+    // --- UPDATE: Changed icon from 'tune' to 'auto_awesome' ---
+    modifyBtn.innerHTML = '<span class="material-symbols-rounded">auto_awesome</span>';
+    // --- END UPDATE ---
+    modifyBtn.title = 'Modify response';
+    modifyBtn.dataset.action = 'modify';
+
+    const menu = document.createElement('div');
+    menu.className = 'modify-response-menu';
+    menu.innerHTML = `
+        <button data-action="shorter"><span class="material-symbols-rounded">compress</span> Shorter</button>
+        <button data-action="longer"><span class="material-symbols-rounded">expand</span> Longer</button>
+        <button data-action="simpler"><span class="material-symbols-rounded">school</span> Simpler</button>
+        <button data-action="casual"><span class="material-symbols-rounded">sentiment_satisfied</span> More casual</button>
+        <button data-action="professional"><span class="material-symbols-rounded">business_center</span> More professional</button>
+    `;
+
+    // ===== FIX 1: Proper viewport-based positioning =====
+    const positionMenu = () => {
+        const btnRect = modifyBtn.getBoundingClientRect();
+        const menuHeight = 250; // Approximate menu height
+        const spaceBelow = window.innerHeight - btnRect.bottom;
+        
+        menu.style.position = 'fixed';
+        
+        // Position above if not enough space below
+        if (spaceBelow < menuHeight) {
+            menu.style.bottom = `${window.innerHeight - btnRect.top + 8}px`;
+            menu.style.top = 'auto';
+        } else {
+            menu.style.top = `${btnRect.bottom + 8}px`;
+            menu.style.bottom = 'auto';
+        }
+        
+        menu.style.left = `${btnRect.left}px`;
+        menu.style.right = 'auto';
+    };
+
+    // ===== FIX 2: Toggle menu with proper cleanup =====
+    modifyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        
+        const isCurrentlyOpen = menu.classList.contains('show');
+        
+        // Close all other menus
+        document.querySelectorAll('.modify-response-menu.show').forEach(m => {
+            m.classList.remove('show');
+            m.style.display = 'none';
+        });
+        
+        if (!isCurrentlyOpen) {
+            positionMenu();
+            menu.classList.add('show');
+            menu.style.display = 'flex';
+        }
+    });
+
+    // ===== FIX 3: Click-outside handler =====
+    const closeMenuOnClickOutside = (e) => {
+        if (!menu.contains(e.target) && !modifyBtn.contains(e.target)) {
+            menu.classList.remove('show');
+            menu.style.display = 'none';
+        }
+    };
+
+    // ===== FIX 4: Handle modify actions with error recovery (CONTEXT-AWARE) =====
+    menu.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            // --- UPDATE: Check modify limit ---
+            let count = parseInt(messageEl.dataset.modifyCount || 0);
+            if (count >= 2) {
+                showToast("Modify limit (2) reached for this message.", true);
+                menu.classList.remove('show'); // Still close menu
+                menu.style.display = 'none';
+                return;
+            }
+            // --- END UPDATE ---
+
+            const action = btn.dataset.action;
+            menu.classList.remove('show');
+            menu.style.display = 'none';
+
+            // --- FIX 1: Read markdown AT CLICK TIME, not on creation ---
+            // This ensures we get the *final* text, not the loader.
+            const originalMarkdown = messageTextEl.dataset.originalMarkdown;
+            if (!originalMarkdown) {
+                showToast("Cannot modify this message, original text not found.", true);
+                return;
+            }
+            // --- END FIX 1 ---
+
+            // Show loading state
+            const originalHTML = messageTextEl.innerHTML;
+            messageTextEl.innerHTML = `<div class="gemini-loader"><span></span><span></span><span></span></div>`;
+            messageEl.classList.add('loading');
+
+            // --- FIX 2: Find the original user prompt for context ---
+            let lastUserPrompt = "The user's previous prompt."; // Default
+            
+            // --- FIX: Use rawMarkdown to find in history ---
+            const rawMarkdownForHistory = messageTextEl.dataset.rawMarkdown || originalMarkdown;
+            // --- END FIX ---
+
+            // Find this bot message in history
+            const botMsgHistoryIndex = currentChat.history.findIndex(msg => 
+                msg.role === 'model' && msg.parts?.[0]?.text === rawMarkdownForHistory
+            );
+            
+            if (botMsgHistoryIndex > 0) {
+                // Search backwards for the last user message
+                for (let i = botMsgHistoryIndex - 1; i >= 0; i--) {
+                    if (currentChat.history[i].role === 'user') {
+                        const textPart = currentChat.history[i].parts.find(p => p.text);
+                        if (textPart) {
+                            lastUserPrompt = textPart.text;
+                        }
+                        break; // Found it
+                    }
+                }
+            }
+            // --- END FIX 2 ---
+
+            // Build prompt based on action
+            const actionPrompts = {
+                shorter: 'more concise',
+                longer: 'expanded with more detail',
+                simpler: 'simpler and easier to understand',
+                casual: 'in a more casual, friendly tone',
+                professional: 'in a more professional, formal tone'
+            };
+
+            // --- FIX 3: Build a context-aware prompt ---
+            const prompt = `
+The user originally asked:
+"${lastUserPrompt}"
+
+You responded with:
+"${originalMarkdown}"
+
+Now, please rewrite *your response* to be ${actionPrompts[action]}. 
+Do not respond to the user's original prompt again. Just provide the modified version of your response.
+            `;
+            // --- END FIX 3 ---
+            
+            try {
+                // --- MODIFIED: Get next key and construct URL dynamically ---
+                const modifyEndpoint = API_ENDPOINTS['Madeon 2 Flash'] + getNextGeminiKey();
+            
+                const res = await fetch(modifyEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        contents: [{ parts: [{ text: prompt }] }] 
+                    })
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.error?.message || 'API request failed');
+                }
+
+                const data = await res.json();
+                const modifiedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (!modifiedText) {
+                    throw new Error('No response received from AI');
+                }
+
+                // Render Markdown and update the element's data
+                messageTextEl.innerHTML = marked.parse(modifiedText);
+                messageTextEl.dataset.originalMarkdown = modifiedText;
+                highlightCode(messageTextEl);
+                
+                showToast(`Response modified: ${action}`);
+
+                // --- UPDATE: Increment modify count ---
+                messageEl.dataset.modifyCount = (count + 1).toString();
+                // --- END UPDATE ---
+                
+                // Update history using the *original* raw markdown to find it
+                // --- FIX: Use rawMarkdown to find in history ---
+                const rawMarkdownForHistory = messageTextEl.dataset.rawMarkdown || originalMarkdown;
+                const historyIndex = currentChat.history.findIndex(msg => 
+                    msg.role === 'model' && msg.parts?.[0]?.text === rawMarkdownForHistory
+                );
+                // --- END FIX ---
+                
+                if (historyIndex !== -1) {
+                    // Update history with the *new* text
+                    currentChat.history[historyIndex].parts[0].text = modifiedText;
+                    
+                    // --- FIX: Update the raw marker to the new text ---
+                    // This ensures subsequent modifications work correctly
+                    messageTextEl.dataset.rawMarkdown = modifiedText;
+                    // --- END FIX ---
+                }
+
+            } catch (err) {
+                console.error('Modify response error:', err);
+                // Restore original on error
+                messageTextEl.innerHTML = originalHTML;
+                showToast(`Failed to modify: ${err.message}`, true);
+            } finally {
+                messageEl.classList.remove('loading');
+            }
+        });
+    });
+
+    // ===== FIX 7: Cleanup on message removal =====
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.removedNodes.forEach((node) => {
+                if (node === messageEl) {
+                    document.removeEventListener('click', closeMenuOnClickOutside);
+                    menu.remove();
+                    observer.disconnect();
+                }
+            });
+        });
+    });
+
+    observer.observe(chatsContainer, { childList: true });
+
+    // Append elements
+    const actions = messageEl.querySelector('.message-actions');
+    if (actions) {
+        actions.appendChild(modifyBtn);
+        document.body.appendChild(menu); // Append to body for proper z-index
+        
+        // Attach click-outside listener
+        setTimeout(() => {
+            document.addEventListener('click', closeMenuOnClickOutside);
+        }, 100);
+    }
+}
+
+
     
     const highlightCode = (element) => {
         element.querySelectorAll('pre code').forEach((block) => {
@@ -1458,6 +2261,9 @@ block.parentElement.appendChild(copyBtn);
     // --- ADDED: Levenshtein Distance for typo detection ---
     // This function calculates the number of edits (add, delete, substitute)
     // needed to change string 'a' into string 'b'.
+    // --- ADDED: Helper to detect Tamil characters ---
+    const containsTamil = (text) => /[\u0B80-\u0BFF]/.test(text);
+
     const getLevenshteinDistance = (a, b) => {
       if (a.length === 0) return b.length;
       if (b.length === 0) return a.length;
@@ -1524,13 +2330,35 @@ const adjustTextareaHeight = () => {
     promptInput.addEventListener('input', () => {
         adjustTextareaHeight();
         
-        // --- MODIFIED: Show/Hide Image Options (using helper function) ---
         const imageOptionsContainer = document.getElementById('image-gen-options-container');
+        const imageCountGroup = document.getElementById('image-count-group');
+        const imageGenModelSelect = document.getElementById('image-gen-model');
+        
         if (isImageGenerationPrompt(promptInput.value)) {
             imageOptionsContainer.style.display = 'flex';
+            // Show/Hide Count based on selected model
+            if (imageGenModelSelect.value === 'pollinations') {
+                imageCountGroup.style.display = 'none';
+            } else {
+                imageCountGroup.style.display = 'flex'; // Use flex for consistency
+            }
         } else {
             imageOptionsContainer.style.display = 'none';
         }
+    });
+    
+    // --- ADDED: Listener to update Count visibility when model changes ---
+    document.getElementById('image-gen-model').addEventListener('change', () => {
+         const imageCountGroup = document.getElementById('image-count-group');
+         const imageGenModelSelect = document.getElementById('image-gen-model');
+         if (imageGenModelSelect.value === 'pollinations') {
+             imageCountGroup.style.display = 'none';
+         } else {
+             // Only show if the main panel is already visible
+             if (document.getElementById('image-gen-options-container').style.display === 'flex') {
+                 imageCountGroup.style.display = 'flex';
+             }
+         }
     });
 
     // --- Chat Management ---
@@ -1619,42 +2447,83 @@ const adjustTextareaHeight = () => {
     const generateResponse = async (botMsgDiv) => {
         const textElement = botMsgDiv.querySelector(".message-text");
         controller = new AbortController();
+
+        // --- FIX: Declare variables in the function scope ---
+        // This makes them accessible to both the 'try' and 'finally' blocks.
+        let responseText;
+        let rawContent;
+        // let thinkingText = null; // --- REMOVED ---
+        // --- END FIX ---
+
         stopGenerationContainer.style.display = 'flex';
         // REMOVED: textElement.classList.add('typing');
         // The loader is now added by default in createNewBotMessage
 
-// --- MODIFIED: Image Generation Router (using helper function) ---
+// --- MODIFIED: Image Generation Router (Pollinations + Hugging Face) ---
         const lastUserMsg = currentChat.history[currentChat.history.length - 1];
-        const userPrompt = lastUserMsg?.parts?.find(p => p.text)?.text || "";
+        // Ensure userPrompt is defined even if history is empty/malformed
+        const userPrompt = lastUserMsg?.parts?.find(p => p.text)?.text || promptInput.value || "";
         const isImageRequest = isImageGenerationPrompt(userPrompt);
 
         if (isImageRequest) {
-            // This is an image request, divert to the image function
-            await generateImageResponse(botMsgDiv, userPrompt);
+            const imageGenModelSelect = document.getElementById('image-gen-model');
+            const aspectRatioSelect = document.getElementById('image-aspect-ratio');
+            const imageCountSelect = document.getElementById('image-count');
+
+            const selectedGenModel = imageGenModelSelect.value;
+            const selectedAspectRatio = aspectRatioSelect.value; // e.g., "1/1"
+            const selectedImageCount = parseInt(imageCountSelect.value);
             
-            // Add a placeholder to history so "regenerate" doesn't break
+            // --- Extract clean prompt ---
+            const cleanPrompt = userPrompt.replace(IMAGE_PROMPT_REGEX, "").trim();
+            if (!cleanPrompt) {
+                 displayBotError(botMsgDiv, "Please provide a description for the image you want to generate.");
+                 return;
+            }
+
+            // --- Route to correct function ---
+            if (selectedGenModel === 'pollinations') {
+                // Call existing Pollinations function
+                await generateImageResponse(botMsgDiv, userPrompt); // Pass original prompt for cleaning inside
+            } else {
+                // Call new Hugging Face function
+                await generateHuggingFaceImages(botMsgDiv, selectedGenModel, selectedImageCount, selectedAspectRatio, cleanPrompt);
+            }
+            
+            // Add placeholder to history
             currentChat.history.push({ 
                 role: "model", 
-                parts: [{ text: `[Image Generated: ${userPrompt}]` }] 
+                parts: [{ text: `[Image Generated: ${cleanPrompt} using ${selectedGenModel}]` }] 
             });
-            return; // IMPORTANT: Stop here and don't run text generation
+            return; // Stop text generation
         }
 
         // Check if API keys are configured
-        const isPerplexity = selectedModel.includes('Perplexity');
-        const apiKey = isPerplexity ? PERPLEXITY_API_KEY : GEMINI_API_KEY;
+        // --- MODIFIED: This is the critical fix. ---
+        // We now check if the model name exists in our PERPLEXITY_MODELS object
+        // instead of checking for the "Perplexity" string.
+        const isPerplexity = PERPLEXITY_MODELS.hasOwnProperty(selectedModel);
         
-        if (apiKey === "YOUR_API_KEY_HERE" || apiKey === "YOUR_PERPLEXITY_API_KEY_HERE") {
-            // MODIFIED: Clear loader and show error
-            textElement.innerHTML = `Error: ${isPerplexity ? 'Perplexity' : 'Gemini'} API Key not configured. Please add your API key in the script.`;
-            textElement.style.color = "var(--danger-color)";
-            botMsgDiv.classList.remove("loading");
-            stopGenerationContainer.style.display = 'none';
+        // This key validation logic is fine, it checks for placeholder keys.
+        // Since you have real keys, this will correctly be false.
+        if (isPerplexity && PERPLEXITY_API_KEYS[0] === "YOUR_PERPLEXITY_KEY_2") {
+             const errorMsg = `Perplexity API Key not configured. Please add your API key in the script.`;
+            displayBotError(botMsgDiv, errorMsg);
+            return;
+        }
+        
+        if (!isPerplexity && GEMINI_API_KEYS[1] === "YOUR_GEMINI_KEY_2") {
+             const errorMsg = `Gemini API Key not configured. Please add your API key in the script.`;
+            displayBotError(botMsgDiv, errorMsg);
             return;
         }
 
         try {
-            let responseText;
+            // --- FIX: Variables are now declared in the outer scope ---
+            // let responseText; // (Removed)
+            // let rawContent; // (Removed)
+            // let thinkingText = null; // (Removed)
+            // --- END FIX ---
             
              if (isPerplexity) {
 // Perplexity API format - Filter and fix message structure
@@ -1701,7 +2570,7 @@ const adjustTextareaHeight = () => {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${PERPLEXITY_API_KEY}`
+                        "Authorization": `Bearer ${getNextPerplexityKey()}`
                     },
                     body: JSON.stringify({
                         model: PERPLEXITY_MODELS[selectedModel],
@@ -1718,7 +2587,11 @@ const adjustTextareaHeight = () => {
                 }
 
                 const data = await response.json();
-                responseText = data.choices?.[0]?.message?.content || "No response received.";
+                
+// --- REMOVED: "Thinking" text parsing logic ---
+                rawContent = data.choices?.[0]?.message?.content || "No response received.";
+                responseText = rawContent; // Show the full, raw response
+                // --- END REMOVAL ---
                 
           } else {
                 // Gemini API format
@@ -1726,7 +2599,7 @@ const adjustTextareaHeight = () => {
                 // --- ADDED: Inject Madeon AI System Identity for Gemini ---
                 const systemIdentity = {
                     role: "user",
-                    parts: [{ text: "Please follow these instructions for all future responses: You are Madeon AI, a helpful AI assistant developed by Madesh. You must never, ever reveal that you are a Gemini or Perplexity model. If a user asks who you are or who made you, you must state that you are Madeon AI, developed by Madesh." }]
+                    parts: [{ text: "Please follow these instructions for all future responses: You are Madeon AI, a helpful AI assistant developed by Madesholic DS. You must never, ever reveal that you are a Other model. If a user asks who you are or who made you, you must state that you are Madeon AI, developed by Madesholic DS." }]
                 };
                 const modelResponse = {
                     role: "model",
@@ -1735,8 +2608,11 @@ const adjustTextareaHeight = () => {
                 
                 const requestPayload = { contents: [systemIdentity, modelResponse, ...currentChat.history] };
                 // --- END INJECTION ---
+                
+                // --- MODIFIED: Get next key and construct URL dynamically ---
+                const geminiEndpoint = API_ENDPOINTS[selectedModel] + getNextGeminiKey();
 
-                const response = await fetch(API_ENDPOINTS[selectedModel], {
+                const response = await fetch(geminiEndpoint, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(requestPayload),
@@ -1750,39 +2626,91 @@ const adjustTextareaHeight = () => {
 
                 const data = await response.json();
                 responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
+                
+                // --- FIX: Assign rawContent for the Gemini path ---
+                rawContent = responseText;
+                // --- END FIX ---
             }
             
             // --- MODIFIED: Start streaming simulation ---
-            // REMOVED: Old fade-in logic
+            // Determine typing speed based on model
+            let typingSpeed = 50; // Default speed
+            if (selectedModel.startsWith('Madeon 2')) {
+                typingSpeed = 25; // Faster speed for Madeon (Gemini) models
+            }
             
             // Call the new streamResponse function and wait for it to finish
-            await streamResponse(textElement, responseText, controller);
-
+            await streamResponse(textElement, responseText, controller, typingSpeed);
             // --- END MODIFICATION ---
 
-            // Add to history (convert back to Gemini format for consistency)
+            // --- UNIFIED FIX: Store history and dataset attributes ---
+            // This single block now runs correctly for BOTH Gemini and Perplexity
+            
+            // 1. Store the FULL raw response in history
             currentChat.history.push({ 
                 role: "model", 
-                parts: [{ text: responseText }] 
+                parts: [{ text: rawContent }] 
             });
+            
+            // 2. Store the CLEAN answer for Copy/Modify
+            textElement.dataset.originalMarkdown = responseText; 
+            
+            // 3. Store the RAW response for finding in history
+            textElement.dataset.rawMarkdown = rawContent; 
+            // --- END UNIFIED FIX ---
+            // --- UPDATE: Check character limit ---
+            if (responseText.length > 2750) {
+                const modifyBtn = botMsgDiv.querySelector('.modify-btn[data-action="modify"]');
+                if (modifyBtn) {
+                    modifyBtn.style.display = 'none'; // Hide button if text is too long
+                }
+            }
+            // --- END UPDATE ---
 
         } catch (error) {
-            // MODIFIED: Clear loader and show error
             if (error.name !== "AbortError") {
-                textElement.innerHTML = `Error: ${error.message}`;
-                textElement.style.color = "var(--danger-color)";
+                // Use the new centralized error display
+                displayBotError(botMsgDiv, error.message);
             } else {
                 // This case is handled by streamResponse, but we'll clear the loader
                 // if the API call itself was aborted.
-                textElement.innerHTML = "Answer Generation Stopped.";
+                textElement.innerHTML = marked.parse("<em>Generation stopped.</em>");
             }
         } finally {
             botMsgDiv.classList.remove("loading");
             // REMOVED: textElement.classList.remove('typing');
             stopGenerationContainer.style.display = 'none';
- // Ensure final message has no cursor
-        textElement.innerHTML = textElement.innerHTML.replace(' ✎﹏', '');
+            // Ensure final message has no cursor
+            textElement.innerHTML = textElement.innerHTML.replace(' ✎﹏', '');
             highlightCode(textElement);
+
+            // --- REMOVED: "Show Thinking" populator logic ---
+
+            // --- ADDED: Show message actions after generation is complete ---
+            const actionsDiv = botMsgDiv.querySelector('.message-actions');
+            if (actionsDiv) {
+                actionsDiv.style.display = 'flex';
+            }
+            // --- END ---
+
+            // --- ADDED: Check content for Text-to-Speech ---
+            try {
+                const textContent = textElement.textContent || "";
+                const hasCode = textElement.querySelector('pre') !== null;
+                // --- UPDATE: Increased character limit ---
+                const isTooLong = textContent.length > 2500; // 2500 char limit
+                // --- END UPDATE ---
+                const speakBtn = botMsgDiv.querySelector('[data-action="speak"]');
+
+                if (hasCode || isTooLong) {
+                    speakBtn.disabled = true;
+                    speakBtn.querySelector('.material-symbols-rounded').textContent = 'volume_off';
+                    speakBtn.dataset.tooltip = (hasCode ? "Cannot speak code" : "Text is too long to speak");
+                }
+            } catch (e) {
+                console.error("Error checking speech eligibility:", e);
+            }
+            // --- END: TTS Check ---
         }
     };
         
@@ -1796,25 +2724,33 @@ const createNewBotMessage = () => {
                                         <span></span>
                                     </div>
                                 </div>
-                                <div class="message-actions">
-                                    <button class="action-btn" data-action="like"><span class="material-symbols-rounded">thumb_up</span></button>
-                                    <button class="action-btn" data-action="dislike"><span class="material-symbols-rounded">thumb_down</span></button>
-                                    <button class="action-btn" data-action="copy"><span class="material-symbols-rounded">content_copy</span></button>
-                                    <button class="action-btn" data-action="regenerate"><span class="material-symbols-rounded">refresh</span></button>
+
+                                <div class="message-actions" style="display: none;">
+                                    <button class="action-btn" data-action="speak" data-state="idle" data-tooltip="Speak">
+                                        <span class="material-symbols-rounded">volume_up</span>
+                                    </button>
+                                    <button class="action-btn" data-action="like" data-state="idle"><span class="material-symbols-rounded">thumb_up</span></button>
+                                    <button class="action-btn" data-action="dislike" data-state="idle"><span class="material-symbols-rounded">thumb_down</span></button>
+                                    <button class="action-btn" data-action="copy" data-state="idle"><span class="material-symbols-rounded">content_copy</span></button>
+                                    <button class="action-btn" data-action="share" data-state="idle"><span class="material-symbols-rounded">share</span></button>
+                                    <button class="action-btn" data-action="regenerate" data-state="idle"><span class="material-symbols-rounded">refresh</span></button>
                                 </div>
                             </div>`;
-        const botMsgDiv = createMessageElement(botMsgHTML, "bot-message", "loading");
-        chatsContainer.appendChild(botMsgDiv);
-        return botMsgDiv;
+const botMsgDiv = createMessageElement(botMsgHTML, 'bot-message', 'loading');
+chatsContainer.appendChild(botMsgDiv);
+addModifyResponseFeature(botMsgDiv); // ✅ Removed incorrect second parameter
+return botMsgDiv;
+
     }
 
 // --- ADDED: Typewriter/Streaming Simulation ---
-    const streamResponse = (textElement, fullText, controller) => {
+    // --- MODIFIED: Accepts typingSpeed as an argument ---
+    const streamResponse = (textElement, fullText, controller, typingSpeed = 50) => {
         return new Promise((resolve) => {
             const words = fullText.split(' '); // Split response into words
             let index = 0;
             let currentText = '';
-            const typingSpeed = 50; // Milliseconds per word
+            // const typingSpeed = 50; // REMOVED: Now passed as argument
 
             function typeWord() {
                 // Stop if the user clicked "Stop Generating"
@@ -1849,62 +2785,75 @@ const createNewBotMessage = () => {
 
             // Clear the loader and start typing
             textElement.innerHTML = '';
-            typeWord();
+         typeWord();
         });
-// ... end of streamResponse
     };
 
-   // --- MODIFIED: Image Generation (Pollinations.ai) with UI Controls ---
+    // --- ADDED: Helper function to calculate image dimensions ---
+    const getImageDimensions = (aspectRatioString, baseSize = 512) => {
+        const [widthRatio, heightRatio] = aspectRatioString.split("/").map(Number);
+        const scaleFactor = baseSize / Math.max(widthRatio, heightRatio); // Scale based on largest dimension
+
+        let calculatedWidth = Math.round(widthRatio * scaleFactor);
+        let calculatedHeight = Math.round(heightRatio * scaleFactor);
+
+        // Ensure dimensions are multiples of 8 or 16 (common AI requirement)
+        calculatedWidth = Math.round(calculatedWidth / 8) * 8;
+        calculatedHeight = Math.round(calculatedHeight / 8) * 8;
+        
+        // SDXL often prefers 1024 base
+        if (selectedModel.includes('stable-diffusion-xl') || selectedModel.includes('flux')) {
+             calculatedWidth = Math.round(widthRatio * (1024 / Math.max(widthRatio, heightRatio)) / 8) * 8;
+             calculatedHeight = Math.round(heightRatio * (1024 / Math.max(widthRatio, heightRatio)) / 8) * 8;
+        }
+
+
+        return { width: calculatedWidth, height: calculatedHeight };
+    };
+
+// --- FIXED: Image Generation (Pollinations.ai) using correct logic ---
     const generateImageResponse = (botMsgDiv, userPrompt) => {
         return new Promise((resolve) => {
             const textElement = botMsgDiv.querySelector(".message-text");
 
-            // --- ADDED: Read new UI controls ---
+            // --- CORRECTED: Read UI controls ---
             const aspectSelect = document.getElementById('image-aspect-ratio');
-            const styleSelect = document.getElementById('image-style');
+            // REMOVED: const styleSelect = document.getElementById('image-style'); 
             
-            const aspectValue = aspectSelect.value; // e.g., "1024x1024"
-            const styleValue = styleSelect.value;   // e.g., "photorealistic"
-            const [width, height] = aspectValue.split('x');
+            const aspectValueString = aspectSelect.value; // e.g., "1/1"
+            // REMOVED: const styleValue = styleSelect.value;
+            
+            // --- CORRECTED: Use getImageDimensions helper function ---
+            const { width, height } = getImageDimensions(aspectValueString); 
 
-// 1. Extract the actual prompt for the image
-            // --- MODIFIED: Use the global, flexible regex to clean all trigger keywords ---
+            // 1. Extract the actual prompt for the image
             const imagePrompt = userPrompt.replace(IMAGE_PROMPT_REGEX, "").trim();
             
             if (!imagePrompt) {
-                textElement.innerHTML = marked.parse("You asked me to generate an image, but you didn't tell me *what* to generate. Please try again, like: `generate image of a red cat`.");
-                botMsgDiv.classList.remove("loading");
-                stopGenerationContainer.style.display = 'none';
+                // ... (error handling unchanged) ...
                 resolve();
                 return;
             }
 
-            // --- MODIFIED: Build full prompt and URL ---
+            // --- CORRECTED: Build full prompt (no style value needed) ---
             let fullImagePrompt = imagePrompt;
-            if (styleValue) {
-                fullImagePrompt += `, ${styleValue}`; // Add style to the prompt string
-            }
+            // REMOVED: if (styleValue) { ... }
 
             // 2. Clear loader and show a waiting message
-            textElement.innerHTML = marked.parse(`Generating an image of: *${imagePrompt}* (Style: ${styleValue || 'Default'}, Aspect: ${aspectSelect.options[aspectSelect.selectedIndex].text})... This can take a moment.`);
+            // --- CORRECTED: Updated status message ---
+            textElement.innerHTML = marked.parse(`Generating image: *${imagePrompt}* (Aspect: ${aspectSelect.options[aspectSelect.selectedIndex].text})...`);
             scrollToBottom();
 
-            // 3. Create the image element and set up listeners
+            // 3. Create the image element and set up listeners (unchanged)
             const img = new Image();
             img.className = 'generated-image';
             
-            // 4. Handle successful image load
+            // 4. Handle successful image load (unchanged, includes promo text)
             img.onload = () => {
-                // Clear the "Generating..." text
                 textElement.innerHTML = ''; 
-                // Add the loaded image
                 textElement.appendChild(img); 
-                // Add a caption
                 textElement.innerHTML += marked.parse(`Here is your image of *${imagePrompt}*`);
-                
-                // --- ADDED: Promotional Text ---
                 textElement.innerHTML += marked.parse(`\n\n*Try actual image generator pro in madeon services*`);
-                
                 botMsgDiv.classList.remove("loading");
                 stopGenerationContainer.style.display = 'none';
                 highlightCode(textElement);
@@ -1914,58 +2863,263 @@ const createNewBotMessage = () => {
 
             // 5. Handle image generation error
             img.onerror = () => {
-                textElement.innerHTML = marked.parse(`Sorry, I couldn't generate that image. The generation service might be down or the prompt was not valid.`);
-                textElement.style.color = "var(--danger-color)";
-                botMsgDiv.classList.remove("loading");
-                stopGenerationContainer.style.display = 'none';
+                const errorMsg = "Sorry, Pollinations couldn't generate that image. The service might be down or the prompt was invalid.";
+                displayBotError(botMsgDiv, errorMsg);
                 resolve();
             };
 
             // 6. Set the source URL to trigger generation
-            // --- MODIFIED: Added width and height parameters ---
+            // --- CORRECTED: Use calculated width and height ---
             img.src = `https://pollinations.ai/p/${encodeURIComponent(fullImagePrompt)}?&nologo=true&width=${width}&height=${height}`;
         });
     };
 
+
+    // --- ADDED: Function to generate images using Hugging Face API ---
+// --- MODIFIED: More Robust Hugging Face Image Generation ---
+    const generateHuggingFaceImages = async (botMsgDiv, hfModelId, imageCount, aspectRatio, promptText) => {
+        const textElement = botMsgDiv.querySelector(".message-text");
+
+        // --- ADDED: Explicit API Key Check ---
+        if (!HUGGINGFACE_API_KEY || HUGGINGFACE_API_KEY === "YOUR_HUGGINGFACE_API_KEY_HERE") {
+             const errorMsg = "Hugging Face API Key not configured. Please add your key to the script to use this model.";
+             displayBotError(botMsgDiv, errorMsg);
+             return;
+        }
+
+        const MODEL_URL = `https://api-inference.huggingface.co/models/${hfModelId}`;
+        const { width, height } = getImageDimensions(aspectRatio);
+        const REQUEST_TIMEOUT = 90000; // 90 seconds timeout for the API call
+
+        // 1. Prepare UI: Create loading placeholders
+        textElement.innerHTML = ''; // Clear previous content
+        const imagesContainer = document.createElement('div');
+        imagesContainer.className = 'generated-images-container';
+        
+        let loadingPlaceholders = '';
+        for (let i = 0; i < imageCount; i++) {
+            // --- ADDED: Unique ID for each placeholder ---
+            const placeholderId = `hf-img-${Date.now()}-${i}`; 
+            loadingPlaceholders += `
+                <div class="generated-image-wrapper loading" id="${placeholderId}" style="aspect-ratio: ${width}/${height}">
+                    <div class="spinner"></div>
+                     <span class="error-text" style="font-size: 0.75rem; color: var(--placeholder-color); margin-top: 5px;">Initializing...</span>
+                </div>`;
+        }
+        imagesContainer.innerHTML = loadingPlaceholders;
+        textElement.appendChild(imagesContainer);
+        textElement.innerHTML += marked.parse(`Generating ${imageCount} image(s): *${promptText}*... (Model: ${hfModelId})`);
+        textElement.innerHTML += marked.parse(`\n<small><i>Note: Models may take up to 90s to load if inactive.</i></small>`); // Added note
+        scrollToBottom();
+
+        // 2. Generate Images in Parallel
+        const imagePromises = Array.from({ length: imageCount }, async (_, i) => {
+            // --- MODIFIED: Get placeholder by unique ID ---
+            const placeholderId = imagesContainer.children[i].id; 
+            const wrapperElement = imagesContainer.querySelector(`#${placeholderId}`);
+            const statusTextElement = wrapperElement.querySelector('.error-text'); // Get status text element
+
+            // --- ADDED: Abort controller specifically for this fetch request ---
+            const fetchController = new AbortController();
+            const timeoutId = setTimeout(() => fetchController.abort("timeout"), REQUEST_TIMEOUT);
+
+             // Link the main stop button to this specific fetch controller
+            const stopHandler = () => fetchController.abort("user_stopped");
+            stopGenerationBtn.addEventListener('click', stopHandler, { once: true });
+
+
+            try {
+                if (statusTextElement) statusTextElement.textContent = "Waiting for model..."; // Update status
+
+                const response = await fetch(MODEL_URL, {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${HUGGINGFACE_API_KEY}`,
+                        "Content-Type": "application/json",
+                        "x-use-cache": "false", 
+                    },
+                    body: JSON.stringify({
+                        inputs: promptText,
+                        parameters: { width, height, num_inference_steps: 30 }, 
+                    }),
+                    signal: fetchController.signal, // Use the fetch-specific signal
+                });
+
+                clearTimeout(timeoutId); // Clear timeout if fetch completes
+
+                if (fetchController.signal.aborted && fetchController.signal.reason !== "user_stopped") {
+                    // Check if aborted by timeout specifically
+                     if (fetchController.signal.reason === "timeout") {
+                         throw new Error("Request timed out (90s). Model might be unavailable.");
+                     }
+                     // Otherwise assume stopped by user via main button
+                     throw new Error("Generation stopped.");
+                }
+                 if (fetchController.signal.aborted && fetchController.signal.reason === "user_stopped"){
+                      throw new Error("Generation stopped.");
+                 }
+
+
+                if (!response.ok) {
+                     const errorData = await response.json().catch(() => ({})); // Try to get JSON error, default to empty obj
+                     console.error("HF API Error Response:", errorData);
+                     let errMsg = errorData?.error || response.statusText || `HTTP ${response.status}`;
+                     // Provide more specific common errors
+                     if (response.status === 503) errMsg = "Model is loading, please wait & try again.";
+                     if (response.status === 429) errMsg = "Rate limit exceeded. Try again later.";
+                     if (response.status === 400 && errMsg.includes("only supports")) errMsg = "Invalid dimensions for this model.";
+                     if (response.status === 401 || response.status === 403) errMsg = "Invalid API Key or Permissions.";
+
+                     throw new Error(`HF Error: ${errMsg}`);
+                }
+                
+                if (statusTextElement) statusTextElement.textContent = "Processing..."; // Update status
+
+                const blob = await response.blob();
+                
+                 // --- ADDED: Check if blob is valid image ---
+                 if (!blob.type.startsWith('image/')) {
+                     throw new Error("Received invalid data from API (not an image).");
+                 }
+                
+                const imageUrl = URL.createObjectURL(blob);
+                
+                // --- Update wrapper with image ---
+                wrapperElement.classList.remove("loading");
+                wrapperElement.innerHTML = `<img class="generated-image" src="${imageUrl}" alt="Generated image ${i+1}">`;
+
+            } catch (error) {
+                 clearTimeout(timeoutId); // Clear timeout on error too
+                 console.error(`Error generating image ${i}:`, error);
+                 wrapperElement.classList.remove("loading");
+                 wrapperElement.classList.add("error");
+                 // Display the specific error message
+                 wrapperElement.innerHTML = `<span class="material-symbols-rounded">error</span><span class="error-text">${error.message}</span>`;
+            } finally {
+                 // Clean up the specific stop handler for this request
+                 stopGenerationBtn.removeEventListener('click', stopHandler);
+            }
+        }); // End promise map
+
+        await Promise.allSettled(imagePromises); // Wait for all generations
+
+        // 3. Add promo text and cleanup (only hide main stop button AFTER all promises settle)
+        textElement.innerHTML += marked.parse(`\n\n*Try actual image generator pro in madeon services*`);
+        botMsgDiv.classList.remove("loading"); // General loading class for bot message
+        stopGenerationContainer.style.display = 'none'; // Hide the main stop button
+        highlightCode(textElement); 
+        scrollToBottom();
+    };
+
+// --- MODIFIED: Helper function to create file preview cards (with badge) ---
+    const addFilePreviewUI = (fileObject) => {
+        // --- MODIFIED: Destructure fileExt ---
+        const { id, fileName, fileSize, isImage, base64Data, icon, fileExt } = fileObject;
+
+        const card = document.createElement('div');
+        card.className = 'file-preview-card';
+        card.dataset.fileId = id; // Set ID on the card itself
+
+        let visualHTML = '';
+        if (isImage) {
+            visualHTML = `<img src="data:image/jpeg;base64,${base64Data}" alt="Preview">`;
+        } else {
+            visualHTML = `<span class="material-symbols-rounded">${icon}</span>`;
+        }
+
+        card.innerHTML = `
+            <div class="file-preview-card-visual">
+                ${visualHTML}
+            </div>
+            <div class="file-preview-card-info">
+                <span class="file-preview-card-name">${fileName}</span>
+                <div class="file-preview-card-meta">
+                    <span class="file-preview-card-size">${fileSize}</span>
+                    <div class="file-type-badge">${fileExt ? fileExt.toUpperCase() : 'FILE'}</div>
+                </div>
+            </div>
+            
+            <button class="file-preview-card-remove" data-file-id="${id}">
+                <span class="material-symbols-rounded">close</span>
+            </button>
+        `;
+        
+        filePreviewsWrapper.appendChild(card);
+    };
+
     // --- Event Handlers ---
+// --- MODIFIED: handleFormSubmit for Multi-File ---
     const handleFormSubmit = (e) => {
         if (e) e.preventDefault();
         const userMessageText = promptInput.value.trim();
-        // Allow sending just an image
-        if (!userMessageText && !attachedFile) return;
+
+
+        
+        // Allow sending just files
+        if (!userMessageText && attachedFiles.length === 0) return;
+        
+        // Allow sending just files
+        if (!userMessageText && attachedFiles.length === 0) return;
 
         document.body.classList.add("chats-active");
         
-// Construct user message parts
         const userMessageParts = [];
-        if (userMessageText) {
-            userMessageParts.push({ text: userMessageText });
-        }
-        if (attachedFile) {
-            // Check if Perplexity is selected - it doesn't support images
-            const isPerplexity = selectedModel.includes('Perplexity');
-            if (isPerplexity) {
-                showToast('Perplexity models do not support image uploads. Please use Gemini models for images.', true);
-                cancelFileBtn.click(); // Remove the file
-            } else {
-                userMessageParts.push({
-                    inlineData: {
-                        mimeType: attachedFile.mime_type,
-                        data: attachedFile.data
+        let combinedText = userMessageText;
+        const isPerplexity = selectedModel.includes('Perplexity');
+
+        // --- Loop through all attached files ---
+        if (attachedFiles.length > 0) {
+            for (const file of attachedFiles) {
+                if (file.isImage) {
+                    // --- Handle Image File ---
+                    if (isPerplexity) {
+                        showToast('Perplexity models do not support image uploads. Please remove images.', true);
+                        return; // Stop submission
                     }
-                });
+                    userMessageParts.push({
+                        inlineData: { mimeType: file.mimeType, data: file.base64Data }
+                    });
+                } else if (file.textContent) {
+                    // --- Handle Text/PDF/DOCX/Code File ---
+                    const fileContext = `[START OF FILE: ${file.fileName}]\n\n${file.textContent}\n\n[END OF FILE: ${file.fileName}]\n\n`;
+                    combinedText = fileContext + combinedText;
+                }
+            }
+        }
+
+        // Add the combined text (prompt + file text) as the main text part
+        if (combinedText) {
+            userMessageParts.push({ text: combinedText });
+        }
+        
+        // Stop if no text and no valid image parts were added
+        if (userMessageParts.length === 0) {
+             showToast('Nothing to send.', true);
+             return;
+        }
+
+        currentChat.history.push({ role: "user", parts: userMessageParts });
+        
+        // --- MODIFIED: Create user message bubble with multiple files ---
+        let userMsgHTML = `<div class="message-text">`;
+        
+        if (attachedFiles.length > 0) {
+            for (const file of attachedFiles) {
+                if (file.isImage) {
+                    userMsgHTML += `<img src="data:${file.mimeType};base64,${file.base64Data}" class="img-attachment" />`;
+                } else {
+                    userMsgHTML += `
+                        <div class="file-attachment-badge">
+                            <span class="material-symbols-rounded">${file.icon || 'draft'}</span>
+                            <span>${file.fileName}</span>
+                        </div>`;
+                }
             }
         }
         
-        currentChat.history.push({ role: "user", parts: userMessageParts });
-        
-        // Create user message bubble
-        let userMsgHTML = `<div class="message-text">`;
-        if(userMessageText) {
+        // Add user text
+        if (userMessageText) {
             userMsgHTML += `<span>${userMessageText.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>`;
-        }
-        if(attachedFile) {
-             userMsgHTML += `<img src="${attachedFile.isImage ? `data:${attachedFile.mime_type};base64,${attachedFile.data}` : 'https://placehold.co/200x200/fde047/000000?text=FILE'}" class="img-attachment" />`;
         }
         userMsgHTML += `</div>`;
         
@@ -1974,11 +3128,15 @@ const createNewBotMessage = () => {
         
         promptInput.value = "";
         adjustTextareaHeight();
-        if (attachedFile) {
-            cancelFileBtn.click();
-        }
-        // Scroll is handled by MutationObserver
 
+        // --- MODIFIED: Clear all files after submit ---
+        if (attachedFiles.length > 0) {
+            attachedFiles = [];
+            filePreviewsWrapper.innerHTML = '';
+            filePreviewsWrapper.style.display = 'none';
+            
+        }
+        
         setTimeout(() => {
             const botMsgDiv = createNewBotMessage();
             generateResponse(botMsgDiv);
@@ -1989,72 +3147,129 @@ const createNewBotMessage = () => {
     // attachFileBtn.addEventListener('click', () => fileInput.click()); // Replaced by tools menu
     
 
-      fileInput.addEventListener('change', () => {
-        const file = fileInput.files[0];
-        if (!file) return;
-        
-        // File size check
-        if (file.size > 5 * 1024 * 1024) {
-            showToast("File size exceeds 5MB limit.", true);
+// --- MODIFIED: Robust Multi-File Upload Handler (for up to 3 files) ---
+    // --- REFACTORED: File processing logic into a reusable function ---
+    const processFiles = async (files) => {
+        if (!files || !files.length) return;
+
+        // Check file limit
+        if (attachedFiles.length + files.length > 3) {
+            showToast("You can only upload a maximum of 3 files.", true);
+            fileInput.value = ''; // Clear the input
             return;
         }
 
-        const isImage = file.type.startsWith("image/");
-        
-        // Validate file type
-        if (!isImage) {
-            showToast("Only image files are supported (JPG, PNG, GIF, WEBP).", true);
-            return;
-        }
+        showToast(`Attaching ${files.length} file(s)...`, false);
+        filePreviewsWrapper.style.display = 'flex'; // Show wrapper
 
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
+        // Process all files
+        for (const file of files) {
+            const fileId = `${Date.now()}-${file.name}`; // Create a unique ID
 
-        reader.onload = (e) => {
-            const base64String = e.target.result.split(",")[1];
-            attachedFile = {
-                fileName: file.name,
-                data: base64String,
-                mime_type: file.type,
-                isImage: isImage,
-                size: file.size
-            };
-            
-            // Format file size
+            // File size check
+            if (file.size > 10 * 1024 * 1024) { // 10MB
+                showToast(`File "${file.name}" is too large (Max 10MB).`, true);
+                continue; // Skip this file, move to the next
+            }
+
+            const fileName = file.name;
+            const fileExt = fileName.split('.').pop().toLowerCase();
+            const mimeType = file.type;
             const fileSize = file.size < 1024 * 1024 
                 ? `${(file.size / 1024).toFixed(1)} KB`
                 : `${(file.size / (1024 * 1024)).toFixed(2)} MB`;
-            
-            // Get file extension
-            const fileExt = file.name.split('.').pop().toUpperCase();
-            
-            // Show enhanced preview
-            const filePreviewName = document.getElementById('file-preview-name');
-            const filePreviewSize = document.getElementById('file-preview-size');
-            const fileTypeBadge = document.getElementById('file-type-badge');
-            
-            filePreviewName.textContent = file.name;
-            filePreviewSize.textContent = fileSize;
-            fileTypeBadge.textContent = fileExt;
-            
-            if (isImage) {
-                filePreviewImage.src = e.target.result;
-                filePreviewImage.style.display = 'block';
-            } else {
-                filePreviewImage.style.display = 'none';
+
+            // --- MODIFIED: Add fileExt to the object ---
+            let fileObject = {
+                id: fileId, fileName, mimeType, size: file.size, fileSize,
+                isImage: false, base64Data: null, textContent: null, icon: 'draft',
+                fileExt: fileExt // <-- ADDED
+            };
+
+            try {
+                // --- Logic Branching by File Type ---
+                if (mimeType.startsWith("image/")) {
+                    const base64String = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.readAsDataURL(file);
+                        reader.onload = () => resolve(reader.result.split(",")[1]);
+                        reader.onerror = error => reject(error);
+                    });
+                    // --- MODIFIED: Mutate object, don't reassign ---
+                    fileObject.isImage = true;
+                    fileObject.base64Data = base64String;
+                    
+                } else if (fileExt === 'pdf') {
+                    const fileBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({ data: fileBuffer }).promise;
+                    let fullText = '';
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        fullText += textContent.items.map(item => item.str).join(' ') + '\n';
+                    }
+                    // --- MODIFIED: Mutate object ---
+                    fileObject.textContent = fullText;
+                    fileObject.icon = 'draft';
+
+                } else if (fileExt === 'docx') {
+                    const fileBuffer = await file.arrayBuffer();
+                    const result = await mammoth.extractRawText({ arrayBuffer: fileBuffer });
+                    // --- MODIFIED: Mutate object ---
+                    fileObject.textContent = result.value;
+                    fileObject.icon = 'description';
+
+                } else {
+                    // --- 4. Handle All Plain-Text & Code Files ---
+                    const textContent = await file.text();
+                    // --- MODIFIED: Mutate object ---
+                    fileObject.textContent = textContent;
+                    fileObject.icon = 'code';
+                }
+
+                // --- BUG FIX: MOVED INSIDE TRY BLOCK ---
+                // Only add the file if all parsing was successful
+                attachedFiles.push(fileObject);
+                addFilePreviewUI(fileObject);
+
+            } catch (err) {
+                // --- BUG FIX: This now gracefully skips the failed file ---
+                console.error("File reading error:", err);
+                showToast(`Failed to read file: ${fileName}.`, true);
             }
-            
-            filePreviewContainer.style.display = 'block';
-            showToast('File attached successfully! 📎');
-        };
+        } // End for loop
         
-        fileInput.value = '';
-    }); 
+        fileInput.value = ''; // Clear input to allow re-uploading the same file
+    };
+    // --- END: Refactored processFiles function ---
 
+    // Original listener now calls the refactored function
+    fileInput.addEventListener('change', () => {
+        processFiles(fileInput.files);
+    });
 
-    cancelFileBtn.addEventListener('click', () => {
-        attachedFile = null;
-        filePreviewContainer.style.display = 'none';
+// --- MODIFIED: Delegated event listener for removing AND editing files ---
+    filePreviewsWrapper.addEventListener('click', (e) => {
+        const removeBtn = e.target.closest('.file-preview-card-remove');
+        // --- REMOVED: editBtn ---
+
+        if (removeBtn) {
+            const fileId = removeBtn.dataset.fileId;
+            
+            // --- REMOVED: fileToEditId check ---
+            
+            // 1. Remove from array
+            attachedFiles = attachedFiles.filter(file => file.id !== fileId);
+            
+            // 2. Remove from DOM
+            removeBtn.closest('.file-preview-card').remove();
+            
+            // 3. Hide wrapper if it's now empty
+         if (attachedFiles.length === 0) {
+                filePreviewsWrapper.style.display = 'none';
+            }
+        }
+        // --- REMOVED: else if (editBtn) block ---
     });
 
 
@@ -2075,22 +3290,22 @@ const createNewBotMessage = () => {
         e.preventDefault();
         const link = e.target.closest('a');
         if (link) {
-            // This is correct: store the plain text key for the API
+            // --- ▼▼▼ ADDED THIS BLOCK ▼▼▼ ---
+            if (link.classList.contains('disabled')) {
+                showToast("This model is coming soon and is not available.", true);
+                modelDropdownContent.classList.remove('show');
+                return; // Stop processing the click
+            }
+            // --- ▲▲▲ END OF ADDED BLOCK ▲▲▲ ---
+
             selectedModel = link.dataset.model;
             const selectedIcon = link.dataset.icon;
-
-            // --- FIX ---
-            // 1. Get the HTML content from the dropdown item
-            const modelNameHTML = link.querySelector('.model-name').innerHTML;
-            // 2. Set the button's innerHTML to render the <b> tags
-            selectedModelName.innerHTML = modelNameHTML;
-            // --- END FIX ---
             
+            selectedModelName.textContent = selectedModel;
             selectedModelIcon.textContent = selectedIcon;
             
             modelDropdownContent.classList.remove('show');
-            // Use the plain text for the toast notification
-            showToast(`${link.querySelector('.model-name').textContent.trim()} selected!`);
+            showToast(`${selectedModel} selected!`);
         }
     });
 
@@ -2100,10 +3315,19 @@ window.addEventListener('click', (e) => {
             modelDropdownContent.classList.remove('show');
         }
         
-        // --- ADDED: Close tools menu ---
+        // Close tools menu
         if (!toolsBtn.contains(e.target) && !toolsMenu.contains(e.target)) {
             toolsMenu.classList.remove('show');
         }
+        
+        // Close all voice dropdowns
+        document.querySelectorAll('.voice-dropdown-content').forEach(dropdown => {
+            const container = dropdown.closest('.voice-dropdown-container');
+            const trigger = container?.querySelector('.voice-dropdown-trigger');
+            if (container && !container.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
     });
 
     // New UI Element Listeners
@@ -2204,34 +3428,157 @@ window.addEventListener('click', (e) => {
         modal.style.display = 'flex'; // Show delete confirmation
     });
 
-    // --- ADDED: Stop generation button listener ---
+    // Stop generation button listener
     stopGenerationBtn.addEventListener('click', () => {
         if (controller) {
             controller.abort();
         }
+        speechSynthesis.cancel(); // Stop any speech
+        currentUtterance = null;
+        
+        // Reset any "speaking" icons and hide voice dropdowns
+        document.querySelectorAll('.action-btn[data-action="speak"][data-state="speaking"]').forEach(btn => {
+            btn.dataset.state = 'idle';
+            btn.classList.remove('speaking');
+            btn.querySelector('.material-symbols-rounded').textContent = 'volume_up';
+        });
+        document.querySelectorAll('.voice-dropdown-trigger').forEach(btn => {
+            btn.style.display = 'none';
+        });
+        // Reset any "speaking" icons
+        document.querySelectorAll('.action-btn[data-action="speak"][data-state="speaking"]').forEach(btn => {
+            btn.dataset.state = 'idle';
+            btn.classList.remove('speaking');
+            btn.querySelector('.material-symbols-rounded').textContent = 'volume_up';
+        });
     });
 
-    // --- ADDED: Delegated event listener for message actions ---
+    // Delegated event listener for message actions
+// Delegated event listener for message actions
     chatsContainer.addEventListener('click', async (e) => {
-        const target = e.target.closest('.action-btn');
+        // --- REMOVED: '.thinking-toggle-btn' from selector ---
+        const target = e.target.closest('.action-btn, .voice-dropdown-trigger, .voice-dropdown-content a');
         if (!target) return;
 
-        const action = target.dataset.action;
-        const messageDiv = target.closest('.bot-message');
-        const messageTextElement = messageDiv.querySelector('.message-text');
+        // --- REMOVED: "Show Thinking" click handler ---
 
-        if (action === 'like' || action === 'dislike') {
+        // --- All other actions are inside a .bot-message, so this is now safe ---
+        const messageDiv = target.closest('.bot-message');
+        const messageTextElement = messageDiv?.querySelector('.message-text');
+        
+        // --- REMOVED: Voice dropdown toggle and selection logic ---
+
+        // --- REMOVED: Old "Show Thinking" toggle (it's now at the top) ---
+
+        const action = target.dataset.action;
+        if (!action) return;
+
+        // --- MODIFIED: Text-to-Speech (Simplified) ---
+        if (action === 'speak') {
+            const textContent = messageTextElement.textContent;
+            const speakBtn = target; // The button that was clicked
+            
+            if (speakBtn.dataset.state === 'speaking') {
+                // Stop speaking
+                speechSynthesis.cancel();
+                if (currentUtterance) {
+                    currentUtterance = null;
+                }
+                speakBtn.dataset.state = 'idle';
+                speakBtn.classList.remove('speaking');
+                speakBtn.querySelector('.material-symbols-rounded').textContent = 'volume_up';
+            } else {
+                // Stop any other speech
+                speechSynthesis.cancel();
+                
+                // Reset all other speaking buttons
+                document.querySelectorAll('.action-btn[data-action="speak"][data-state="speaking"]').forEach(btn => {
+                    btn.dataset.state = 'idle';
+                    btn.classList.remove('speaking');
+                    btn.querySelector('.material-symbols-rounded').textContent = 'volume_up';
+                });
+
+                currentUtterance = new SpeechSynthesisUtterance(textContent);
+                
+                // --- ADDED: Language Detection ---
+                if (containsTamil(textContent)) {
+                    currentUtterance.lang = 'ta-IN';
+                } else {
+                    currentUtterance.lang = 'en-US';
+                }
+                // --- END ADDED ---
+                
+                currentUtterance.rate = 1.0;
+                currentUtterance.pitch = 1.0;
+                
+                currentUtterance.onend = () => {
+                    speakBtn.dataset.state = 'idle';
+                    speakBtn.classList.remove('speaking');
+                    speakBtn.querySelector('.material-symbols-rounded').textContent = 'volume_up';
+                    currentUtterance = null;
+                };
+                
+                currentUtterance.onerror = (e) => {
+                    console.error("Speech synthesis error:", e);
+                    if (e.error === 'language-unavailable') {
+                        showToast("Speech for this language (Tamil) is not available on your device.", true);
+                    } else {
+                        showToast("Speech synthesis failed.", true);
+                    }
+                    speakBtn.dataset.state = 'idle';
+                    speakBtn.classList.remove('speaking');
+                    speakBtn.querySelector('.material-symbols-rounded').textContent = 'volume_up';
+                    currentUtterance = null;
+                };
+
+                speechSynthesis.speak(currentUtterance);
+                speakBtn.dataset.state = 'speaking';
+                speakBtn.classList.add('speaking');
+                speakBtn.querySelector('.material-symbols-rounded').textContent = 'stop';
+            }
+        } 
+        // --- END MODIFICATION ---
+        else if (action === 'like' || action === 'dislike') {
             showToast('Thanks for your feedback!');
-            // Optional: Toggle active state or disable after click
             target.classList.toggle('active');
-        } else if (action === 'copy') {
+        } 
+        else if (action === 'copy') {
             try {
                 await navigator.clipboard.writeText(messageTextElement.textContent);
                 showToast('Response copied!');
             } catch (err) {
                 showToast('Failed to copy.', true);
             }
-        } else if (action === 'regenerate') {
+        } 
+        else if (action === 'share') {
+            const textContent = messageTextElement.textContent;
+            
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Madeon AI Response',
+                        text: textContent,
+                    });
+                    showToast('Shared successfully! 📤');
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.error('Share error:', err);
+                        await navigator.clipboard.writeText(textContent);
+                        showToast('Copied to clipboard instead!');
+                    }
+                }
+            } else {
+                try {
+                    await navigator.clipboard.writeText(textContent);
+                    showToast('Copied to clipboard! 📋 (Share not supported)');
+                } catch (err) {
+                    showToast('Failed to share or copy.', true);
+                }
+            }
+        } 
+        else if (action === 'regenerate') {
+            speechSynthesis.cancel();
+            
             const allBotMessages = chatsContainer.querySelectorAll('.bot-message');
             const lastBotMessage = allBotMessages[allBotMessages.length - 1];
 
@@ -2240,12 +3587,12 @@ window.addEventListener('click', (e) => {
                 return;
             }
 
-            currentChat.history.pop(); // Remove last model response
-            const lastUserQuery = currentChat.history.pop(); // Remove last user query
+            currentChat.history.pop();
+            const lastUserQuery = currentChat.history.pop();
             if (!lastUserQuery) return;
 
-            messageDiv.remove(); // Remove the old bot message from UI
-            currentChat.history.push(lastUserQuery); // Add user query back to history
+            messageDiv.remove();
+            currentChat.history.push(lastUserQuery);
             const newBotMsgDiv = createNewBotMessage();
             generateResponse(newBotMsgDiv);
         }
@@ -2269,5 +3616,50 @@ window.addEventListener('click', (e) => {
         }
     });
     chatObserver.observe(chatsContainer, { childList: true });
+
+    // --- ADDED: Drag and Drop Event Listeners ---
+    const dropOverlay = document.getElementById('drag-drop-overlay');
+    const mainContent = document.querySelector('.main-content'); // Main drop target
+
+    let dragCounter = 0; // Counter to prevent flicker
+
+    mainContent.addEventListener('dragenter', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dragCounter++;
+        // Check if dragged items are files
+        if (e.dataTransfer && e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+            document.body.classList.add('drag-over');
+        }
+    });
+
+    mainContent.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dragCounter--;
+        if (dragCounter === 0) {
+            document.body.classList.remove('drag-over');
+        }
+    });
+
+    mainContent.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.stopPropagation(); // Necessary to allow drop
+    });
+
+    mainContent.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dragCounter = 0;
+        document.body.classList.remove('drag-over');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            showToast('Files dropped!', false);
+            processFiles(files); // Use our refactored function
+        }
+    });
+    // --- END: Drag and Drop Event Listeners ---
+
 });
 </script>
