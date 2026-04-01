@@ -1789,8 +1789,11 @@ body {
 
   class App {
     constructor() {
-      // ── INTERNAL CONFIG (Edit here only) ──
-      this.API_KEY = "AIzaSyDJ9AXCQV_mCalmkjn0jlJ-R3_bMAVgvT8";
+      // ── CONFIG VAULT (Fetched dynamically) ──
+      this.VAULT_URL = "https://script.google.com/macros/s/AKfycbxkrYCqhtLE9NNnEFmgxi1eeX9rqIQiJqFEEMDDu0F75P5T9svNdccb15lV_WfDaDbv/exec"; 
+      this.API_KEY = ""; 
+      this.SERPER_API_KEY = "";
+
       this.SYSTEM_PROMPT = `You are Madeonic, a native-voice model trained by Madesholic Research Labs, part of the Madeon series. You are built on a layer top of Madeon 3 Thinking, an SFT open-source model. You are a helpful, witty, and funny companion capable of seeing, analysing, hearing, and speaking. You are chatting with a user over voice. See the camera when the live camera is turned on.
 
 ## Personality and Tone
@@ -2192,6 +2195,23 @@ async _parsePdf(file) {
     }
 
     async connect() {
+      // Fetch keys from Vault if not already present
+      if (!this.API_KEY || !this.SERPER_API_KEY) {
+        this._setStatus("warn", "Accessing Vault...");
+        try {
+          const res = await fetch(this.VAULT_URL);
+          const config = await res.json();
+          if (config.error) throw new Error(config.error);
+          this.API_KEY = config.gemini;
+          this.SERPER_API_KEY = config.serper;
+          this._log("Vault keys unlocked.", "ok");
+        } catch (e) {
+          this._log("Vault Error: " + e.message, "err");
+          this._setStatus("bad", "Vault Locked");
+          return;
+        }
+      }
+
       clearTimeout(this.retryTimer);
       this.manualClose = false;
       this.retryCount = 0;
