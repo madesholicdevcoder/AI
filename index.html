@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Madeonic</title>
+  <title>Madeonic x Voxtral</title>
   <!-- Favicons -->
   <link rel="icon" href="https://files.manuscdn.com/user_upload_by_module/session_file/310519663498817059/KijwmstFSlDETBQB.ico" sizes="any">
   <link rel="icon" href="https://files.manuscdn.com/user_upload_by_module/session_file/310519663498817059/NGyYTdYiKhcjmRdC.png" type="image/png" sizes="32x32">
@@ -23,28 +23,28 @@
 
 body {
       font-family: 'DM Sans', sans-serif;
-      background: #ffffff;
+      background: rgba(245, 238, 255, 0.72);
       color: #1a1a2e;
       overflow: hidden;
     }
 
-    /* ── Simple Pastel Purple Gradient (Stripe-Free) ── */
+    /* ── Soft Pastel Purple Gradient ── */
     #mainScreen {
-      background: linear-gradient(180deg, #f5f0ff 0%, #ffffff 100%) !important;
+      background: linear-gradient(180deg, rgba(242, 233, 255, 0.78) 0%, rgba(252, 248, 255, 0.65) 100%) !important;
     }
 
-    /* ── Orange Speaking Glow (Claude Style) ── */
+    /* ── Speaking Glow — Brighter & More Visible ── */
     #speakingGlow {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      height: 40vh;
-      background: radial-gradient(50% 100% at 50% 100%, rgba(168, 120, 255, 0.22) 0%, rgba(200, 160, 255, 0.08) 60%, rgba(168, 120, 255, 0) 100%);
+      height: 55vh;
+      background: radial-gradient(50% 100% at 50% 100%, rgba(155, 90, 255, 0.55) 0%, rgba(190, 140, 255, 0.30) 45%, rgba(210, 170, 255, 0.14) 72%, rgba(168, 120, 255, 0) 100%);
       pointer-events: none;
       z-index: 2;
       opacity: 0;
-      transition: opacity 0.6s ease;
+      transition: opacity 0.5s ease;
     }
     body.ai-speaking #speakingGlow { opacity: 1; }
 
@@ -1684,10 +1684,59 @@ body {
     }
     /* Hide always toast once chat starts OR once connected */
     body.chat-active #alwaysToast,
-    body.connected #alwaysToast {
+    body.connected #alwaysToast,
+    body.has-resume #alwaysToast {
       opacity: 0;
       pointer-events: none;
       transform: translateX(-50%) translateY(6px);
+    }
+
+    /* ── Session Resume Buttons (Homepage) ── */
+    #sessionResumeBlock {
+      position: absolute;
+      bottom: 188px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      z-index: 19;
+      width: calc(100% - 48px);
+      max-width: 320px;
+      animation: msgFade 0.45s cubic-bezier(0.2,0.8,0.2,1);
+    }
+    #sessionResumeBlock.visible { display: flex; }
+    body.chat-active #sessionResumeBlock,
+    body.connected #sessionResumeBlock { display: none !important; }
+
+    .resume-btn {
+      width: 100%;
+      padding: 13px 20px;
+      border-radius: 100px;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: -0.01em;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .resume-btn:active { transform: scale(0.97); }
+    .resume-btn.primary {
+      background: linear-gradient(135deg, #7c3aed 0%, #9b59f5 100%);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(124,58,237,0.30), 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .resume-btn.primary:hover { box-shadow: 0 6px 24px rgba(124,58,237,0.40); }
+    .resume-btn.secondary {
+      background: rgba(255,255,255,0.78);
+      color: #3a2a5e;
+      border: 1.5px solid rgba(180,150,255,0.35);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
 
     /* ── Chain-of-Thought Box (Lora / Anthropic palette) ── */
@@ -1883,6 +1932,47 @@ body {
       flex-shrink: 0;
     }
 
+    /* ── Voice Card List ── */
+    .voice-card-list { display: flex; flex-direction: column; gap: 7px; }
+    .voice-card {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 14px; border-radius: 14px;
+      border: 1.5px solid #e4e8ef; background: #f7f9fc;
+      cursor: pointer; transition: border-color 0.18s, background 0.18s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .voice-card:active { background: rgba(58,160,213,0.05); }
+    .voice-card.selected {
+      border-color: #7c3aed; background: rgba(124,58,237,0.06);
+    }
+    .voice-card-left { display: flex; align-items: center; gap: 10px; }
+    .voice-card-check {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid #d1d5db; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.18s, background 0.18s;
+    }
+    .voice-card.selected .voice-card-check {
+      border-color: #7c3aed; background: #7c3aed;
+    }
+    .voice-card-check-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #fff; opacity: 0; transition: opacity 0.15s;
+    }
+    .voice-card.selected .voice-card-check-dot { opacity: 1; }
+    .voice-card-name { font-size: 0.9rem; font-weight: 600; color: #1c1c2e; }
+    .voice-card.selected .voice-card-name { color: #7c3aed; }
+    .voice-play-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 1.5px solid #e4e8ef; background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; color: #64748b;
+      transition: border-color 0.15s, color 0.15s, transform 0.1s;
+    }
+    .voice-play-btn:active { transform: scale(0.9); }
+    .voice-play-btn.playing { border-color: #7c3aed; color: #7c3aed; background: rgba(124,58,237,0.07); }
+    .voice-play-btn i { font-size: 14px; pointer-events: none; }
+
   </style>
 </head>
 <body>
@@ -1963,13 +2053,23 @@ body {
   <div id="alwaysToast">
     <div class="toast-skin" style="cursor:pointer;" onclick="document.getElementById('uiConnectBtn').click();">
       <div class="toast-icon-box">
-        <img src="https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773578/rftorpw4x4nkcemokulx.png" alt="Madeonic">
+        <img src="https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773580/xhtozvje43ofyalumqjl.png" alt="Madeonic">
       </div>
       <div class="toast-text">
-        <span class="toast-ttl">Madeonic is supercharged.</span>
-        <span class="toast-sub">The smartest live companion, w/ memory.</span>
+        <span class="toast-ttl">Madeonic is ready</span>
+        <span class="toast-sub">Connect to start talking — mic turns on automatically</span>
       </div>
     </div>
+  </div>
+
+  <!-- ── Session Resume Block (shown if a previous session handle exists) ── -->
+  <div id="sessionResumeBlock">
+    <button class="resume-btn primary" id="resumeSessionBtn">
+      <i class="ph-bold ph-arrow-counter-clockwise" style="font-size:14px; margin-right:6px; vertical-align:-2px;"></i>Continue where you picked off!
+    </button>
+    <button class="resume-btn secondary" id="newSessionBtn">
+      <i class="ph-bold ph-sparkle" style="font-size:14px; margin-right:6px; vertical-align:-2px;"></i>New Live Session
+    </button>
   </div>
 
   <!-- ── Bottom Toolbar ── -->
@@ -2111,6 +2211,8 @@ body {
         <option value="Leda">Leda</option>
         <option value="Orus">Orus</option>
         <option value="Aoede" selected>Aoede</option>
+        <option value="Callirrhoe">Callirrhoe</option>
+        <option value="Autonoe">Autonoe</option>
         <option value="Enceladus">Enceladus</option>
       </select>
 
@@ -2118,16 +2220,9 @@ body {
 
       <!-- ── Voice ── -->
       <p class="s-section-title">Voice</p>
-      <div class="pill-group" id="voicePills">
-        <button class="pill-btn" onclick="app.handleVoiceChange('Zephyr', this)">Zephyr</button>
-        <button class="pill-btn" onclick="app.handleVoiceChange('Puck', this)">Puck</button>
-        <button class="pill-btn" onclick="app.handleVoiceChange('Charon', this)">Charon</button>
-        <button class="pill-btn" onclick="app.handleVoiceChange('Kore', this)">Kore</button>
-        <button class="pill-btn" onclick="app.handleVoiceChange('Fenrir', this)">Fenrir</button>
-        <button class="pill-btn" onclick="app.handleVoiceChange('Leda', this)">Leda</button>
-        <button class="pill-btn" onclick="app.handleVoiceChange('Orus', this)">Orus</button>
-        <button class="pill-btn active" onclick="app.handleVoiceChange('Aoede', this)">Aoede</button>
-        <button class="pill-btn" onclick="app.handleVoiceChange('Enceladus', this)">Enceladus</button>
+      <p style="font-size:0.75rem; color:#9ba5b4; margin-top:-8px; margin-bottom:12px; line-height:1.4;">Changing voices starts a new session</p>
+      <div class="voice-card-list" id="voiceCardList">
+        <!-- Injected by JS below -->
       </div>
 
       <!-- ── Pace ── -->
@@ -2560,7 +2655,15 @@ web_search is for genuinely external or real-time information ONLY. Use it for: 
 
 ## Memory Protocol
 
-Be extremely selective with the save_memory tool. Only save information that the user explicitly asks you to 'remember', 'save', or 'know'. Never save routine actions, temporary feelings, or filler talk. If you are unsure, do not save it.
+Be extremely selective with the save_memory tool. ONLY save a memory when:
+1. The user explicitly says "remember this", "save that", "note that", or similar direct requests.
+2. The user shares a critical life-fact that changes future interactions (e.g. their name, a major allergy, a hard personal goal, a deep preference they state clearly).
+
+NEVER save: greetings, one-off emotions ("I'm tired today"), routine questions, search results, things the user is just discussing, or any fact that is not durable and personally meaningful. If uncertain — do NOT save. Quality over quantity. Each saved memory should be worth recalling in a future session weeks from now.
+
+## Persona Awareness
+
+The user's persona and long-term memories are injected into your system prompt at the start of every session. Use this context naturally to tailor your tone, vocabulary, references, and responses to who this specific person is. Don't announce that you "know" things about them — just speak as if you naturally understand them. If the user's name is known, use it warmly but not excessively.
 
 ## Language and Accent
 
@@ -2572,15 +2675,17 @@ If the user asks about your technical details, Madeon, or Madesholic Research La
       this.SERPER_API_KEY = "cb755e744cf18d1b482c6876ebd07385454adfe3"; // PRELOADED KEY
       // ── Voice Samples (Edit URLs here) ──
       this.voiceSamples = {
-        Zephyr: "https://www.gstatic.com/lamda/images/voices/zephyr.mp3",
-        Puck: "https://www.gstatic.com/lamda/images/voices/puck.mp3",
-        Charon: "https://www.gstatic.com/lamda/images/voices/charon.mp3",
-        Kore: "https://www.gstatic.com/lamda/images/voices/kore.mp3",
-        Fenrir: "https://www.gstatic.com/lamda/images/voices/fenrir.mp3",
-        Leda: "https://www.gstatic.com/lamda/images/voices/leda.mp3",
-        Orus: "https://www.gstatic.com/lamda/images/voices/orus.mp3",
-        Aoede: "https://www.gstatic.com/lamda/images/voices/aoede.mp3",
-        Enceladus: "https://www.gstatic.com/lamda/images/voices/enceladus.mp3"
+        Zephyr:     "https://files.manuscdn.com/user_upload_by_module/session_file/310519663455718240/PJXCmLCZNRErMeOu.mp3",
+        Puck:       "https://files.manuscdn.com/user_upload_by_module/session_file/310519663455718240/yJbytdpTThHKuRwe.mp3",
+        Charon:     "https://files.manuscdn.com/user_upload_by_module/session_file/310519663455718240/yhfLZwOnvpzMQaFD.mp3",
+        Kore:       "https://files.manuscdn.com/user_upload_by_module/session_file/310519663455718240/lTpGvLhFVdTDPTcZ.mp3",
+        Fenrir:     "https://files.manuscdn.com/user_upload_by_module/session_file/310519663455718240/qRtIetaNAVzyWFsD.mp3",
+        Leda:       "https://files.manuscdn.com/user_upload_by_module/session_file/310519663455718240/ZgrUarPLXSOHdbMM.mp3",
+        Orus:       "https://files.manuscdn.com/user_upload_by_module/session_file/310519663455718240/SUNjUqalhLnXLSEK.mp3",
+        Aoede:      "https://files.manuscdn.com/user_upload_by_module/session_file/310519663455718240/MfHoNIJmjwJZCJIt.mp3",
+        Callirrhoe: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663455718240/dsNTXVAVEBZPrqDz.mp3",
+        Autonoe:    "https://files.manuscdn.com/user_upload_by_module/session_file/310519663455718240/pNmBgcVKOowouGhB.mp3",
+        Enceladus:  "https://files.manuscdn.com/user_upload_by_module/session_file/310519663455718240/XOdWwGPsvWJYHcSb.mp3"
       };
       this.samplePlayer = new Audio();
       
@@ -2651,21 +2756,86 @@ async uploadFile(file) {
       return;
     }
 
-    // 3. ROUTE: Images (Multimodal Vision)
+    // 3. ROUTE: Images — realtimeInput.video (only supported format for images in Live API)
+    // To fix second-image hallucination: send the image 6× rapidly so the model's
+    // visual context is dominated by THIS image, not the previous one.
+    // clientContent+inlineData causes 1007 "invalid argument" in AUDIO-only sessions.
     if (file.type.startsWith('image/')) {
-      reader.onload = () => {
-        const base64 = reader.result.split(',')[1];
-        this._send({
-          realtimeInput: { video: { data: base64, mimeType: file.type } }
-        });
-        this._send({ realtimeInput: { text: `Look at this image (${file.name}) and analyze it.` } });
-        this._log(`Sent image: ${file.name}`, "ok");
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        // Resize to max 768px — enough detail, avoids size errors
+        const MAX = 768;
+        let w = img.naturalWidth, h = img.naturalHeight;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else       { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob((blob) => {
+          const r2 = new FileReader();
+          r2.onload = () => {
+            const base64 = r2.result.split(',')[1];
+            const frame = { realtimeInput: { video: { data: base64, mimeType: 'image/jpeg' } } };
+            // Send 6 rapid frames so this image dominates the model's visual context
+            // and flushes any previous image from the streaming context window
+            for (let i = 0; i < 6; i++) this._send(frame);
+            // Text prompt after frames are queued
+            setTimeout(() => {
+              this._send({ realtimeInput: { text: `[NEW IMAGE: "${file.name}"] I just uploaded a new image. Please look at it and describe exactly what you see in detail.` } });
+            }, 80);
+            this._log(`Sent image: ${file.name} (${w}×${h}, 6 frames)`, "ok");
+          };
+          r2.readAsDataURL(blob);
+          URL.revokeObjectURL(objectUrl);
+        }, 'image/jpeg', 0.88);
       };
-      reader.readAsDataURL(file);
+      img.onerror = () => { this._log("Image load failed.", "err"); URL.revokeObjectURL(objectUrl); };
+      img.src = objectUrl;
       return;
     }
 
-    // 4. ROUTE: PDF (Internal Conversion Workaround)
+    // 4. ROUTE: Audio files (decode to PCM via Web Audio API)
+    if (file.type.startsWith('audio/')) {
+      try {
+        this._log(`Decoding audio file: ${file.name}...`, "sys");
+        const arrayBuffer = await file.arrayBuffer();
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+        const decoded = await audioCtx.decodeAudioData(arrayBuffer);
+        // Resample to mono 16kHz PCM
+        const offlineCtx = new OfflineAudioContext(1, decoded.duration * 16000, 16000);
+        const source = offlineCtx.createBufferSource();
+        source.buffer = decoded;
+        source.connect(offlineCtx.destination);
+        source.start(0);
+        const rendered = await offlineCtx.startRendering();
+        const float32 = rendered.getChannelData(0);
+        const int16 = new Int16Array(float32.length);
+        for (let i = 0; i < float32.length; i++) {
+          int16[i] = Math.max(-32768, Math.min(32767, Math.round(float32[i] * 32767)));
+        }
+        // Convert to base64
+        const uint8 = new Uint8Array(int16.buffer);
+        let binary = '';
+        for (let i = 0; i < uint8.length; i++) binary += String.fromCharCode(uint8[i]);
+        const base64 = btoa(binary);
+        this._send({
+          realtimeInput: {
+            audio: { data: base64, mimeType: 'audio/pcm;rate=16000' }
+          }
+        });
+        this._send({ realtimeInput: { text: `I've shared an audio file (${file.name}). Please analyze and transcribe or describe it.` } });
+        this._log(`Sent audio: ${file.name}`, "ok");
+        audioCtx.close();
+      } catch (e) {
+        this._log("Audio decode failed: " + e.message, "err");
+      }
+      return;
+    }
+
+    // 5. ROUTE: PDF (Internal Conversion Workaround)
     if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
       try {
         this._log(`Extracting text from PDF...`, "sys");
@@ -2686,8 +2856,8 @@ async uploadFile(file) {
       return;
     }
 
-    // 5. ROUTE: All other Binaries (Docs, Zips, etc.)
-    this._log(`${file.name} is a binary format not supported by the Live API. Please use PDF, Text, or Images.`, "err");
+    // 6. ROUTE: All other Binaries (Docs, Zips, etc.)
+    this._log(`${file.name} is a binary format not supported by the Live API. Please use PDF, Text, Images, or Audio.`, "err");
     this._setStatus("warn", "Format Not Supported");
   }
 
@@ -2703,22 +2873,24 @@ async uploadFile(file) {
 
     _playChime(type) {
       try {
+        if (type === 'success') {
+          // Use the custom connect SFX from CDN
+          const sfx = new Audio('https://files.manuscdn.com/user_upload_by_module/session_file/310519663455718240/jQwJbIJsiRyAAFov.mp3');
+          sfx.volume = 0.55;
+          sfx.play().catch(() => {});
+          return;
+        }
         const ctx = this.player.ensure();
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sine';
-        
-        if (type === 'success') { // Connection blip
-          osc.frequency.setValueAtTime(440, ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15);
-        } else if (type === 'tool') { // Tool call blip
+        if (type === 'tool') {
           osc.frequency.setValueAtTime(660, ctx.currentTime);
           osc.frequency.exponentialRampToValueAtTime(990, ctx.currentTime + 0.05);
-        } else if (type === 'off') { // Disconnect sweep
+        } else if (type === 'off') {
           osc.frequency.setValueAtTime(440, ctx.currentTime);
           osc.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 0.3);
         }
-
         gain.gain.setValueAtTime(0, ctx.currentTime);
         gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.05);
         gain.gain.linearRampToValueAtTime(0, ctx.currentTime + (type === 'off' ? 0.4 : 0.2));
@@ -2923,7 +3095,7 @@ async _parsePdf(file) {
   }
 
   _syncUI() {
-    els.modelBadge.textContent = "madeon-omni-live-preview";
+    els.modelBadge.textContent = "madeon-3-rl-live-preview";
       els.resumeBadge.textContent = this.resumeHandle ? (this.resumeHandle.slice(0, 12) + "…") : "none";
       els.retryBadge.textContent = String(this.retryCount);
       els.resumeHandle.value = this.resumeHandle;
@@ -3123,14 +3295,37 @@ async _parsePdf(file) {
       const persona = JSON.parse(localStorage.getItem('user_persona') || "{}");
       const memories = JSON.parse(localStorage.getItem('user_memories') || "[]");
       
-      let context = "\n\n## USER CONTEXT\n";
-      if (persona.name) context += `- Name: ${persona.name}\n`;
-      if (persona.job) context += `- Occupation: ${persona.job}\n`;
-      if (persona.about) context += `- About User: ${persona.about}\n`;
-      if (persona.instr) context += `- Custom User Instructions: ${persona.instr}\n`;
-      if (memories.length > 0) context += `\n## LONG-TERM MEMORIES\n${memories.map(m => `- ${m}`).join("\n")}`;
-      
-      setup.systemInstruction.parts[0].text += context;
+      let context = "";
+
+      const hasPersona = persona.name || persona.job || persona.about || persona.instr;
+      const hasMemory = memories.length > 0;
+
+      if (hasPersona || hasMemory) {
+        context += "\n\n---\n";
+      }
+
+      if (hasPersona) {
+        context += "\n## User's Persona Details\n";
+        if (persona.name)     context += `- **Name / Call me**: ${persona.name}\n`;
+        if (persona.fullname && persona.fullname !== persona.name) context += `- **Full Name**: ${persona.fullname}\n`;
+        if (persona.job)      context += `- **Occupation**: ${persona.job}\n`;
+        if (persona.industry) context += `- **Industry**: ${persona.industry}\n`;
+        if (persona.company)  context += `- **Company**: ${persona.company}\n`;
+        if (persona.about)    context += `- **About them**: ${persona.about}\n`;
+        if (persona.instr)    context += `- **How they want you to respond**: ${persona.instr}\n`;
+        context += "\nUse this persona to tailor every response naturally — tone, vocabulary, examples, and depth. Do not announce these details back to the user; simply embody this understanding.\n";
+      }
+
+      if (hasMemory) {
+        context += "\n## User's Memory Details\n";
+        context += memories.map((m, i) => `${i + 1}. ${m}`).join("\n");
+        context += "\n\nThese are facts you have specifically been asked to remember about this user. Apply them naturally and proactively where relevant.\n";
+      }
+
+      if (context) {
+        context += "\n---";
+        setup.systemInstruction.parts[0].text += context;
+      }
 
       this._send({ setup });
       this.setupComplete = true;
@@ -3251,8 +3446,10 @@ async _parsePdf(file) {
         const handle = u.handle || u.token || u.newHandle;
         if (handle) {
           this.resumeHandle = handle;
+          // Persist so user can continue if they close and reopen
+          localStorage.setItem('madeonic_session_handle', handle);
           this._syncUI();
-          this._log("Resumption handle updated.", "ok");
+          this._log("Resumption handle updated & saved.", "ok");
         }
       }
 
@@ -4154,19 +4351,16 @@ _appendTranscript(role, text, isStreaming = false) {
     }
 
     async handleVoiceChange(name, btn) {
-      // 1. UI Update
-      const group = document.getElementById('voicePills');
-      group.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      els.voiceSelect.value = name;
-
-      // 2. Play Sample
-      if (this.voiceSamples[name]) {
-        this.samplePlayer.src = this.voiceSamples[name];
-        this.samplePlayer.play().catch(e => console.warn("Sample blocked:", e));
+      // 1. UI Update — btn may be null when called from voice cards
+      if (btn) {
+        const group = document.getElementById('voicePills');
+        if (group) { group.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
       }
+      els.voiceSelect.value = name;
+      // Sync voice card selection
+      if (window._syncVoiceCards) window._syncVoiceCards(name);
 
-      // 3. Dynamic Reconnect
+      // 2. Dynamic Reconnect
       if (this.ws && this.ws.readyState === WebSocket.OPEN) {
         this._log(`Switching voice to ${name}. Reconnecting...`, "sys");
         this.resumeHandle = ""; // KILL RESUMPTION TO FORCE VOICE CHANGE
@@ -4227,6 +4421,12 @@ _appendTranscript(role, text, isStreaming = false) {
       clearTimeout(this.retryTimer);
       clearTimeout(this.videoTimer);
       this.player.clear();
+
+      // Persist session handle before disconnecting so user can resume
+      if (this.resumeHandle) {
+        localStorage.setItem('madeonic_session_handle', this.resumeHandle);
+        this._log("Session handle saved for resume.", "sys");
+      }
       
       // Force hardware stop
       await this.stopMic();
@@ -4261,6 +4461,7 @@ _appendTranscript(role, text, isStreaming = false) {
       this._log("Clearing conversation…", "sys");
       // Disconnect fully, kill handle so new session starts fresh
       this.resumeHandle = "";
+      localStorage.removeItem('madeonic_session_handle');
       await this.disconnect();
       // Clear transcript UI
       els.transcript.innerHTML = "";
@@ -4288,6 +4489,122 @@ _appendTranscript(role, text, isStreaming = false) {
     app._syncUI();
   };
   window.addEventListener("beforeunload", () => { try { app.disconnect(); } catch {} });
+
+  // ── Voice Card List Builder ──
+  (function buildVoiceCards() {
+    const voices = [
+      { name: 'Zephyr' }, { name: 'Puck' }, { name: 'Charon' }, { name: 'Kore' },
+      { name: 'Fenrir' }, { name: 'Leda' }, { name: 'Orus' }, { name: 'Aoede' },
+      { name: 'Callirrhoe' }, { name: 'Autonoe' }, { name: 'Enceladus' }
+    ];
+    const container = document.getElementById('voiceCardList');
+    if (!container) return;
+    let currentAudio = null;
+    let currentPlayBtn = null;
+
+    function stopCurrent() {
+      if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; }
+      if (currentPlayBtn) { currentPlayBtn.classList.remove('playing'); currentPlayBtn.innerHTML = '<i class="ph-bold ph-play"></i>'; currentPlayBtn = null; }
+    }
+
+    voices.forEach(v => {
+      const selected = v.name === 'Aoede';
+      const card = document.createElement('div');
+      card.className = 'voice-card' + (selected ? ' selected' : '');
+      card.dataset.voice = v.name;
+      card.innerHTML = `
+        <div class="voice-card-left">
+          <div class="voice-card-check"><div class="voice-card-check-dot"></div></div>
+          <span class="voice-card-name">${v.name}</span>
+        </div>
+        <button class="voice-play-btn" title="Preview ${v.name}" aria-label="Play ${v.name} sample">
+          <i class="ph-bold ph-play"></i>
+        </button>`;
+
+      // Select voice on card click
+      card.addEventListener('click', function(e) {
+        if (e.target.closest('.voice-play-btn')) return;
+        container.querySelectorAll('.voice-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        if (window.app) window.app.handleVoiceChange(v.name, null);
+      });
+
+      // Play preview on button click
+      const playBtn = card.querySelector('.voice-play-btn');
+      playBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (currentAudio && currentPlayBtn === playBtn) { stopCurrent(); return; }
+        stopCurrent();
+        const url = window.app && window.app.voiceSamples ? window.app.voiceSamples[v.name] : null;
+        if (!url) return;
+        const audio = new Audio(url);
+        audio.volume = 0.8;
+        currentAudio = audio; currentPlayBtn = playBtn;
+        playBtn.classList.add('playing');
+        playBtn.innerHTML = '<i class="ph-bold ph-stop"></i>';
+        audio.play().catch(() => stopCurrent());
+        audio.onended = () => stopCurrent();
+      });
+
+      container.appendChild(card);
+    });
+
+    // Keep card selection in sync when handleVoiceChange is called externally
+    window._syncVoiceCards = function(name) {
+      container.querySelectorAll('.voice-card').forEach(c => {
+        c.classList.toggle('selected', c.dataset.voice === name);
+      });
+      const sel = document.getElementById('voiceSelect');
+      if (sel) sel.value = name;
+    };
+  })();
+  (function initSessionResumeButtons() {
+    var savedHandle = localStorage.getItem('madeonic_session_handle');
+    var resumeBlock = document.getElementById('sessionResumeBlock');
+    var resumeBtn   = document.getElementById('resumeSessionBtn');
+    var newBtn      = document.getElementById('newSessionBtn');
+
+    if (savedHandle && resumeBlock) {
+      // Show the resume buttons and flag body
+      resumeBlock.classList.add('visible');
+      document.body.classList.add('has-resume');
+    }
+
+    if (resumeBtn) {
+      resumeBtn.addEventListener('click', function() {
+        var handle = localStorage.getItem('madeonic_session_handle');
+        if (handle && window.app) {
+          window.app.resumeHandle = handle;
+          window.app._syncUI();
+          window.app._log("Resuming previous session…", "sys");
+        }
+        resumeBlock.classList.remove('visible');
+        document.body.classList.remove('has-resume');
+        document.getElementById('uiConnectBtn').click();
+      });
+    }
+
+    if (newBtn) {
+      newBtn.addEventListener('click', function() {
+        // Clear old handle — start fresh
+        localStorage.removeItem('madeonic_session_handle');
+        if (window.app) {
+          window.app.resumeHandle = "";
+          window.app._syncUI();
+          window.app._log("Starting new session…", "sys");
+        }
+        resumeBlock.classList.remove('visible');
+        document.body.classList.remove('has-resume');
+        document.getElementById('uiConnectBtn').click();
+      });
+    }
+
+    // Hide resume block once connected
+    window.addEventListener('app-ws-connected', function() {
+      if (resumeBlock) resumeBlock.classList.remove('visible');
+      document.body.classList.remove('has-resume');
+    });
+  })();
 })();
 </script>
 <!-- ════════════════════════════════════════
@@ -4298,7 +4615,7 @@ _appendTranscript(role, text, isStreaming = false) {
     position: fixed;
     inset: 0;
     z-index: 600;
-    background: #fff;
+    background: rgba(246, 240, 255, 0.96);
     display: flex;
     align-items: stretch;
     justify-content: center;
@@ -4314,7 +4631,7 @@ _appendTranscript(role, text, isStreaming = false) {
     max-width: 430px;
     display: flex;
     flex-direction: column;
-    background: #fff;
+    background: rgba(246, 240, 255, 0.96);
     font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
@@ -4412,9 +4729,23 @@ _appendTranscript(role, text, isStreaming = false) {
     border-radius: 100px;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    transition: opacity 0.12s, transform 0.1s;
+    transition: opacity 0.12s, transform 0.1s, background 0.3s;
+    position: relative;
+    overflow: hidden;
   }
   .wv-btn:active { opacity: 0.8; transform: scale(0.98); }
+  .wv-btn.counting {
+    background: rgba(120, 70, 210, 0.85);
+    cursor: default;
+    pointer-events: none;
+  }
+  .wv-btn-progress {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    background: rgba(255,255,255,0.18);
+    border-radius: 100px;
+    transition: width linear;
+  }
 </style>
 
 <div id="welcomeOverlay">
@@ -4469,6 +4800,16 @@ _appendTranscript(role, text, isStreaming = false) {
             <span class="wv-feature-desc">Your session is private. Disconnect anytime from the toolbar.</span>
           </div>
         </div>
+        
+                <div class="wv-feature">
+          <div class="wv-icon-wrap">
+            <img src="https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773578/rftorpw4x4nkcemokulx.png" alt="Control"/>
+          </div>
+          <div class="wv-feature-text">
+            <span class="wv-feature-title">Uses open-source models such as Voxtral</span>
+            <span class="wv-feature-desc">Voxtral is an TTS developed by Mistral AI.</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -4484,12 +4825,51 @@ _appendTranscript(role, text, isStreaming = false) {
     var overlay = document.getElementById('welcomeOverlay');
     var btn     = document.getElementById('welcomeContinueBtn');
 
+    // ── Always show on page open (no localStorage gate) ──
+    overlay.style.display = 'flex';
+
+    var counting = false;
+
+    function startCountdown() {
+      if (counting) return;
+      counting = true;
+      btn.classList.add('counting');
+
+      // Inject progress bar
+      var bar = document.createElement('div');
+      bar.className = 'wv-btn-progress';
+      bar.style.width = '100%';
+      btn.appendChild(bar);
+
+      var seconds = 3;
+      btn.textContent = 'Starting in ' + seconds + '…';
+      btn.appendChild(bar); // re-attach after textContent reset
+
+      var interval = setInterval(function() {
+        seconds--;
+        if (seconds <= 0) {
+          clearInterval(interval);
+          dismissWelcome();
+        } else {
+          btn.textContent = 'Starting in ' + seconds + '…';
+          btn.appendChild(bar);
+          bar.style.width = ((seconds / 3) * 100) + '%';
+        }
+      }, 1000);
+
+      // Animate bar immediately
+      requestAnimationFrame(function() {
+        bar.style.transition = 'width 3s linear';
+        bar.style.width = '0%';
+      });
+    }
+
     function dismissWelcome() {
       overlay.classList.add('hiding');
       setTimeout(function() { overlay.style.display = 'none'; }, 370);
     }
 
-    btn.onclick = dismissWelcome;
+    btn.onclick = startCountdown;
   })();
 </script>
 
