@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Madeonic Live</title>
+  <title>Madeonic V2</title>
   <!-- Background Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Favicons -->
@@ -20,7 +20,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: rgba(0,0,0,0) !important; }
     html, body { height: 100%; overflow: hidden; }
 
 body {
@@ -241,25 +241,12 @@ body {
       50%       { transform: translateX(-50%) translateY(18px) scale(1.04); }
     }
 
-    /* ── Status chip — top right ── */
+    /* ── Status chip — hidden, kept for JS refs ── */
     .status-chip {
+      display: none !important;
       position: absolute;
-      top: 22px;
-      right: 20px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      background: rgba(255,255,255,0.68);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(255,255,255,0.88);
-      border-radius: 999px;
-      padding: 7px 13px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: #555;
-      z-index: 10;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      left: -9999px;
+      pointer-events: none;
     }
     .dot {
       width: 8px; height: 8px;
@@ -303,7 +290,7 @@ body {
     #transcriptContainer {
       position: absolute;
       top: 100px;
-      bottom: 110px;
+      bottom: 160px;
       left: 0;
       right: 0;
       overflow-y: auto;
@@ -784,26 +771,7 @@ body {
     .place-snap-stars { color: #f59e0b; font-weight: 700; }
     .place-snap-actions { display: flex; gap: 8px; flex-shrink: 0; padding-left: 4px; border-left: 1px solid #eee; }
     .place-action-btn { width: 32px; height: 32px; border-radius: 8px; background: #f8fafc; border: 1px solid #e4e8ef; display: flex; align-items: center; justify-content: center; color: #1a1a2e; text-decoration: none; font-size: 1rem; }
-    .ai-actions {
-      display: flex;
-      gap: 16px;
-      margin-top: 10px;
-      color: #a0a0b0;
-      align-items: center;
-    }
-    .ai-actions svg {
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-      stroke-width: 1.8;
-      transition: all 0.2s ease;
-    }
-    .ai-actions svg:hover { color: #1a1a2e; transform: scale(1.1); }
-    .ai-actions i {
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .ai-actions i:hover { color: #1a1a2e; transform: scale(1.1); }
+    /* ai-actions styled above in generation action bar section */
 
     /* ── Advanced Camera PiP ── */
     #cameraContainer {
@@ -874,61 +842,177 @@ body {
     #bars { position: absolute; left: -9999px; opacity: 0; pointer-events: none; }
 
     /* ────────────────────────────────────────
-       BOTTOM TOOLBAR
+       BOTTOM TOOLBAR — 2-ROW COPILOT STYLE
     ──────────────────────────────────────── */
     .toolbar {
       position: absolute;
-      bottom: 28px;
+      bottom: 24px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      align-items: center;
-      gap: 2px;
-      background: rgba(255,255,255,0.86);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255,255,255,0.96);
-      border-radius: 30px;
-      padding: 11px 18px;
-      box-shadow:
-        0 6px 32px rgba(0,0,0,0.08),
-        0 1px 4px rgba(0,0,0,0.05),
-        inset 0 1px 0 rgba(255,255,255,0.95);
+      flex-direction: column;
+      gap: 10px;
       z-index: 20;
+      width: calc(100% - 32px);
+      max-width: 480px;
+      overflow: visible;
     }
 
-    .tool-btn {
-      width: 50px; height: 50px;
-      border: none;
-      border-radius: 50%;
-      background: transparent;
-      cursor: pointer;
+    /* ── Top row: 4 pill buttons ── */
+    .toolbar-top {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 8px;
+      width: 100%;
+    }
+    .tool-pill {
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #2a2a3a;
-      transition: background 0.15s ease, transform 0.1s ease, color 0.2s ease;
+      height: 60px;
+      min-width: 0;
+      border: none;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9);
+      cursor: pointer;
+      color: #1a1a2e;
+      font-size: 22px;
+      transition: background 0.14s, transform 0.1s, color 0.14s;
       outline: none;
       -webkit-tap-highlight-color: transparent;
+      padding: 0;
     }
-    .tool-btn:hover  { background: rgba(0,0,0,0.055); }
-    .tool-btn:active { transform: scale(0.88); background: rgba(0,0,0,0.09); }
-    .tool-btn svg { width: 21px; height: 21px; display: block; }
+    .tool-pill:active { transform: scale(0.93); }
+    .tool-pill.mic-on { background: #1a1a2e; color: #fff; box-shadow: 0 4px 18px rgba(26,26,46,0.22); }
+    .tool-pill.cam-on { color: #3aa0d5; }
+    .tool-pill:disabled { opacity: 0.30; cursor: not-allowed; pointer-events: none; }
 
-    /* Mic active state — matches reference blue circle */
-    .tool-btn.mic-on {
-      background: #3aa0d5;
-      color: #fff;
+    /* ── Bottom row: text input + stop/connect ── */
+    .toolbar-bottom {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
     }
-    .tool-btn.mic-on:hover  { background: #2e92c6; }
-    .tool-btn.mic-on:active { background: #2583b5; }
+    .text-input-wrap {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.92);
+      border-radius: 100px;
+      padding: 0 16px 0 12px;
+      height: 56px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+    .text-input-clip {
+      display: flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; flex-shrink: 0;
+      color: #8892a4; font-size: 19px;
+      cursor: pointer; transition: color 0.14s;
+      background: none; border: none; padding: 0; outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .text-input-clip:hover { color: #1a1a2e; }
+    .text-input-clip:disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+    #uiTextInput {
+      flex: 1; min-width: 0;
+      border: none; outline: none; background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem; font-weight: 400;
+      color: #1a1a2e;
+      caret-color: #7c3aed;
+    }
+    #uiTextInput::placeholder { color: #aab5c0; }
+    .stop-connect-btn {
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 7px;
+      height: 56px;
+      padding: 0 20px;
+      border: none; border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.96rem; font-weight: 700;
+      cursor: pointer;
+      transition: background 0.18s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+    }
+    .stop-connect-btn.state-connect {
+      background: #1a1a2e; color: #fff;
+      box-shadow: 0 4px 18px rgba(26,26,46,0.22);
+    }
+    .stop-connect-btn.state-stop {
+      background: #1a1a2e; color: #fff;
+      box-shadow: 0 4px 18px rgba(26,26,46,0.22);
+    }
+    .stop-connect-btn:active { transform: scale(0.96); }
+    .stop-connect-btn.state-send {
+      background: #1a1a2e; color: #fff;
+      box-shadow: 0 4px 18px rgba(26,26,46,0.22);
+    }
 
-    /* Cam active state */
-    .tool-btn.cam-on { color: #3aa0d5; }
+    /* ── Live waveform bars inside Stop button ── */
+    .stop-wave {
+      display: flex;
+      align-items: center;
+      gap: 2.5px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+    .stop-wave span {
+      width: 3px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.9);
+      transform-origin: bottom center;
+      animation: waveBar 1.1s ease-in-out infinite;
+    }
+    .stop-wave span:nth-child(1) { height: 7px;  animation-delay: 0s;    }
+    .stop-wave span:nth-child(2) { height: 14px; animation-delay: 0.18s; }
+    .stop-wave span:nth-child(3) { height: 20px; animation-delay: 0.36s; }
+    .stop-wave span:nth-child(4) { height: 14px; animation-delay: 0.54s; }
+    .stop-wave span:nth-child(5) { height: 7px;  animation-delay: 0.72s; }
+    @keyframes waveBar {
+      0%, 100% { transform: scaleY(0.35); opacity: 0.45; }
+      50%       { transform: scaleY(1);    opacity: 1;    }
+    }
+
+    /* Screen-share active state */
+    .tool-pill.screen-on { background: #1a1a2e; color: #fff; box-shadow: 0 4px 18px rgba(26,26,46,0.22); }
+
+    /* Screen-share — desktop only pill (visible on mobile, not activatable) */
+    .tool-pill.screen-desktop-only {
+      opacity: 0.38;
+      cursor: not-allowed;
+    }
+    .tool-pill.screen-desktop-only:active { transform: none; }
+
+    /* ── Toolbar focus/active outline killer (fixes ugly box on tap) ── */
+    .toolbar, .toolbar *, .toolbar-top, .toolbar-bottom,
+    .text-input-wrap, .tool-pill, .stop-connect-btn,
+    .text-input-clip, #uiTextInput {
+      outline: none !important;
+      -webkit-tap-highlight-color: transparent !important;
+    }
+    .tool-pill:focus, .tool-pill:focus-visible {
+      outline: none !important;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9) !important;
+    }
+    .stop-connect-btn:focus, .stop-connect-btn:focus-visible,
+    .text-input-clip:focus, .text-input-clip:focus-visible,
+    .toolbar-top:focus-within, .toolbar-bottom:focus-within,
+    .text-input-wrap:focus-within {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    /* ── Tool btn alias for old references ── */
+    .tool-btn { display: none; }
 
     /* Disabled state — not connected yet */
-    .tool-btn:disabled {
-      opacity: 0.28;
+    .tool-pill:disabled {
+      opacity: 0.32;
       cursor: not-allowed;
       pointer-events: none;
     }
@@ -1270,40 +1354,33 @@ body {
     }
     #uiSettingsBtn:hover i { transform: rotate(60deg); }
 
-    /* Toolbar — subtle lift on hover */
-    .toolbar {
-      transition: box-shadow 0.25s ease, transform 0.25s ease;
-    }
-    .toolbar:hover {
-      box-shadow:
-        0 10px 40px rgba(0,0,0,0.11),
-        0 2px 8px rgba(0,0,0,0.07),
-        inset 0 1px 0 rgba(255,255,255,0.95);
-      transform: translateX(-50%) translateY(-2px);
-    }
+    /* Toolbar — no hover lift on mobile to prevent stale hover states */
 
-    /* ── Anthropic Aesthetic Status Pill ── */
+    /* ── Anthropic Aesthetic Status Pill — top right, always alive ── */
     .status-capsule {
       position: absolute;
-      bottom: 100px; /* Floating above toolbar */
-      left: 50%;
-      transform: translateX(-50%);
+      top: 22px;
+      right: 20px;
+      left: auto;
+      transform: none;
       display: flex;
       align-items: center;
-      background: #ffffff;
-      border: 1px solid #f0f0f0;
-      padding: 5px 22px 5px 8px; 
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(240,240,240,0.95);
+      padding: 5px 16px 5px 8px;
       border-radius: 100px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-      gap: 14px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+      gap: 10px;
       user-select: none;
       overflow: hidden;
-      z-index: 100;
-      opacity: 0;
-      transition: opacity 0.5s ease, bottom 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-      pointer-events: none;
+      z-index: 10;
+      opacity: 1;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: opacity 0.4s ease, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events: all;
     }
-    .status-capsule.active { opacity: 1; bottom: 110px; }
+    .status-capsule.active { opacity: 1; }
 
     .pixel-container {
       position: relative;
@@ -1654,7 +1731,7 @@ body {
     ──────────────────────────────────────── */
     #connectHintToast {
       position: fixed;
-      bottom: 116px;
+      bottom: 162px;
       left: 50%;
       transform: translateX(-50%) translateY(10px);
       z-index: 50;
@@ -1676,7 +1753,7 @@ body {
     ──────────────────────────────────────── */
     #alwaysToast {
       position: absolute;
-      bottom: 104px;
+      bottom: 162px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 19;
@@ -1693,53 +1770,141 @@ body {
       transform: translateX(-50%) translateY(6px);
     }
 
-    /* ── Session Resume Buttons (Homepage) ── */
+    /* ── Session Resume — fixed top-left corner ── */
     #sessionResumeBlock {
-      position: absolute;
-      bottom: 188px;
-      left: 50%;
-      transform: translateX(-50%);
+      position: fixed;
+      top: 20px;
+      left: 20px;
       display: none;
-      flex-direction: column;
-      gap: 10px;
-      align-items: center;
-      z-index: 19;
-      width: calc(100% - 48px);
-      max-width: 320px;
-      animation: msgFade 0.45s cubic-bezier(0.2,0.8,0.2,1);
+      z-index: 25;
+      animation: msgFade 0.35s cubic-bezier(0.2,0.8,0.2,1);
     }
-    #sessionResumeBlock.visible { display: flex; }
+    #sessionResumeBlock.visible { display: block; }
     body.chat-active #sessionResumeBlock,
     body.connected #sessionResumeBlock { display: none !important; }
 
     .resume-btn {
-      width: 100%;
-      padding: 13px 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px 7px 9px;
       border-radius: 100px;
-      border: none;
+      border: 1px solid rgba(124,58,237,0.22);
       font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       letter-spacing: -0.01em;
       transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s;
       -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
     }
-    .resume-btn:active { transform: scale(0.97); }
+    .resume-btn:active { transform: scale(0.96); }
     .resume-btn.primary {
-      background: linear-gradient(135deg, #7c3aed 0%, #9b59f5 100%);
-      color: #fff;
-      box-shadow: 0 4px 18px rgba(124,58,237,0.30), 0 1px 4px rgba(0,0,0,0.08);
+      background: rgba(255,255,255,0.82);
+      color: #5b21b6;
+      box-shadow: 0 2px 12px rgba(124,58,237,0.15), 0 1px 3px rgba(0,0,0,0.06);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
     }
-    .resume-btn.primary:hover { box-shadow: 0 6px 24px rgba(124,58,237,0.40); }
-    .resume-btn.secondary {
-      background: rgba(255,255,255,0.78);
-      color: #3a2a5e;
-      border: 1.5px solid rgba(180,150,255,0.35);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    .resume-btn.primary:hover { box-shadow: 0 4px 18px rgba(124,58,237,0.22); background: rgba(255,255,255,0.94); }
+    .resume-btn.primary i { font-size: 15px; color: #7c3aed; }
+    /* hide secondary — connect button handles new session */
+    .resume-btn.secondary { display: none; }
+
+    /* ── duplicate #sessionResumeBlock block removed — canonical definition lives above ── */
+
+    /* ── "Today" Divider + Disclaimer ── */
+    .chat-day-divider {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 4px 0 8px 0;
+      width: 100%;
+    }
+    .chat-day-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .chat-day-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #6b6860;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .chat-day-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(200,192,185,0.7) 0%, rgba(200,192,185,0.15) 100%);
+      border-radius: 1px;
+    }
+    .chat-disclaimer {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 400;
+      color: #6b6860;
+      line-height: 1.58;
+    }
+    .chat-disclaimer a {
+      color: #6b6860;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      text-decoration-thickness: 1px;
+      cursor: pointer;
+    }
+
+    /* ── Transcription Info Tooltip ── */
+    .transcription-info-wrap {
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .transcription-info-btn {
+      background: none; border: none; padding: 0;
+      cursor: pointer; color: rgba(88,88,99,0.55);
+      font-size: 14px; line-height: 1;
+      display: inline-flex; align-items: center;
+      -webkit-tap-highlight-color: transparent;
+      transition: color 0.15s;
+    }
+    .transcription-info-btn:hover { color: rgba(88,88,99,0.9); }
+    .transcription-info-tip {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(26,26,46,0.92);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 400;
+      line-height: 1.5;
+      padding: 8px 12px;
+      border-radius: 10px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+      z-index: 100;
     }
+    .transcription-info-tip::after {
+      content: '';
+      position: absolute;
+      top: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: rgba(26,26,46,0.92);
+    }
+    .transcription-info-tip.show { opacity: 1; }
 
     /* ── Chain-of-Thought Box (Lora / Anthropic palette) ── */
     .cot-box {
@@ -1841,7 +2006,7 @@ body {
     /* ── Disconnect Toast (nova_drift style) ── */
     #disconnectToast {
       position: fixed;
-      bottom: 116px;
+      bottom: 162px;
       left: 50%;
       transform: translateX(-50%) translateY(12px);
       z-index: 200;
@@ -1933,6 +2098,138 @@ body {
       margin: 0 4px;
       flex-shrink: 0;
     }
+
+    /* ── Generation Action Bar ── */
+    .ai-actions {
+      display: flex;
+      gap: 2px;
+      margin-top: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .gen-action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #b0b0c0;
+      font-size: 16px;
+      transition: background 0.15s, color 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .gen-action-btn:hover { background: rgba(0,0,0,0.06); color: #1a1a2e; }
+    .gen-action-btn:active { transform: scale(0.86); }
+    .gen-action-btn.liked { color: #22c55e !important; }
+    .gen-action-btn.disliked { color: #ef4444 !important; }
+    .gen-action-btn.speaking { color: #7c3aed !important; animation: speakPulse 1s ease-in-out infinite; }
+    .gen-action-btn.copied { color: #22c55e !important; }
+    @keyframes speakPulse { 0%,100% { opacity:1; } 50% { opacity:0.55; } }
+
+    /* ── Embedded Feedback Modal ── */
+    #fbModalBackdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.22);
+      z-index: 800;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0 0 100px 0;
+    }
+    #fbModalBackdrop.open { display: flex; }
+    .fb-modal {
+      background: #f2ede6;
+      border-radius: 22px;
+      padding: 24px 24px 24px 24px;
+      width: calc(100% - 32px);
+      max-width: 480px;
+      position: relative;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+      animation: fbSlideUp 0.28s cubic-bezier(0.34,1.56,0.64,1);
+      font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+    }
+    @keyframes fbSlideUp { from { transform: translateY(40px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+    .fb-close {
+      position: absolute;
+      top: 18px; right: 18px;
+      background: none; border: none; cursor: pointer;
+      color: #6b6860;
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s;
+      font-size: 20px;
+    }
+    .fb-close:hover { background: #edeae4; color: #1a1a18; }
+    .fb-title-row {
+      display: flex; align-items: center; gap: 9px;
+      margin-bottom: 22px; padding-right: 34px;
+    }
+    .fb-title-row h2 { font-size: 1.35rem; font-weight: 400; color: #1a1a18; letter-spacing: -0.01em; line-height: 1.2; }
+    .fb-title-row i { font-size: 21px; color: #1a1a18; flex-shrink: 0; }
+    .fb-field-group { margin-bottom: 18px; }
+    .fb-label {
+      display: block; font-size: 0.88rem; font-weight: 700;
+      color: #1a1a18; margin-bottom: 9px; letter-spacing: -0.005em;
+    }
+    .fb-select-wrap { position: relative; }
+    .fb-select-wrap select {
+      appearance: none; -webkit-appearance: none;
+      width: 100%; background: #edeae4;
+      border: 1.5px solid #d6d0c8;
+      border-radius: 14px;
+      padding: 13px 44px 13px 16px;
+      font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.97rem; font-weight: 400; color: #1a1a18; cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .fb-select-wrap select:focus { border-color: #b0a898; outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
+    .fb-chevron {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      pointer-events: none; color: #6b6860; font-size: 18px;
+      display: flex; align-items: center;
+    }
+    .fb-textarea {
+      width: 100%; background: #edeae4;
+      border: 1.5px solid #d6d0c8;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.93rem; font-weight: 400; color: #1a1a18;
+      resize: vertical; min-height: 100px; outline: none; line-height: 1.6;
+      transition: border-color 0.15s;
+    }
+    .fb-textarea::placeholder { color: #9b9892; }
+    .fb-textarea:focus { border-color: #b0a898; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
+    .fb-disclaimer {
+      font-size: 0.79rem; color: #6b6860; line-height: 1.6; margin-bottom: 20px;
+    }
+    .fb-disclaimer a { color: #c96940; text-decoration: underline; text-underline-offset: 2px; }
+    .fb-submit {
+      display: block; width: 100%; background: #1a1a18; color: #fff;
+      border: none; border-radius: 14px; padding: 16px 20px;
+      font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.97rem; font-weight: 700; letter-spacing: 0.01em;
+      cursor: pointer; transition: background 0.15s, transform 0.1s; line-height: 1;
+    }
+    .fb-submit:hover { background: #2e2e2c; }
+    .fb-submit:active { transform: scale(0.99); background: #111110; }
+    .fb-success {
+      display: none; align-items: center; gap: 9px;
+      background: #e8f4ec; border: 1px solid #c3dfc9;
+      border-radius: 10px; padding: 11px 14px; margin-bottom: 16px;
+      font-size: 0.84rem; color: #2d6a3f;
+    }
+    .fb-success.show { display: flex; }
+    .fb-success i { font-size: 17px; flex-shrink: 0; }
 
     /* ── Voice Card List ── */
     .voice-card-list { display: flex; flex-direction: column; gap: 7px; }
@@ -2032,7 +2329,7 @@ body {
       <div class="pixel-grid" id="pillGrid"></div>
       <img id="pillIcon" src="https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773580/xhtozvje43ofyalumqjl.png" alt="" class="center-icon-pill">
     </div>
-    <div id="pillLabel" class="label-pill">Listening</div>
+    <div id="pillLabel" class="label-pill">Offline</div>
   </div>
 
   <!-- ── One-time Connect Hint Toast (first visit only) ── -->
@@ -2064,52 +2361,61 @@ body {
     </div>
   </div>
 
-  <!-- ── Session Resume Block (shown if a previous session handle exists) ── -->
+  <!-- ── Session Resume Block (small top-corner icon, shown if previous session handle exists) ── -->
   <div id="sessionResumeBlock">
-    <button class="resume-btn primary" id="resumeSessionBtn">
-      <i class="ph-bold ph-arrow-counter-clockwise" style="font-size:14px; margin-right:6px; vertical-align:-2px;"></i>Continue where you picked off!
+    <button class="resume-btn primary" id="resumeSessionBtn" title="Resume previous session">
+      <i class="ph-bold ph-arrow-counter-clockwise"></i>Resume session
     </button>
-    <button class="resume-btn secondary" id="newSessionBtn">
-      <i class="ph-bold ph-sparkle" style="font-size:14px; margin-right:6px; vertical-align:-2px;"></i>New Live Session
-    </button>
+    <button class="resume-btn secondary" id="newSessionBtn" style="display:none;"></button>
   </div>
 
-  <!-- ── Bottom Toolbar ── -->
+  <!-- ── Bottom Toolbar (2-row Copilot-style) ── -->
   <div class="toolbar">
-    <!-- 1. End session -->
-    <button class="tool-btn" id="uiEndBtn" title="End session" aria-label="End session">
-      <i class="ph-bold ph-x" style="font-size:21px;"></i>
-    </button>
 
-<!-- 2. Camera toggle -->
-    <button class="tool-btn" id="uiCamBtn" title="Toggle camera" aria-label="Toggle camera" disabled>
-      <i class="ph-bold ph-video-camera" style="font-size:21px;"></i>
-    </button>
+    <!-- Row 1: 4 pill buttons -->
+    <div class="toolbar-top">
 
-    <!-- NEW: File Upload -->
-    <button class="tool-btn" id="uiUploadBtn" title="Upload file" aria-label="Upload file" disabled>
-      <i class="ph-bold ph-paperclip" style="font-size:21px;"></i>
-    </button>
-<!-- Expanded support for all multimodal types: Images, Docs, Audio, Video, Code -->
-    <input type="file" id="fileInput" style="display:none" accept="image/*,audio/*,video/*,application/pdf,text/*,application/json,application/javascript" />
+      <!-- Camera -->
+      <button class="tool-pill" id="uiCamBtn" title="Toggle camera" aria-label="Toggle camera" disabled>
+        <i class="ph-bold ph-video-camera"></i>
+      </button>
 
-    <!-- 3. Connect -->
-    <button class="tool-btn" id="uiConnectBtn" title="Connect" aria-label="Connect">
-      <i class="ph-bold ph-plug-charging" style="font-size:21px;"></i>
-    </button>
+      <!-- Screen Share (desktop only) -->
+      <button class="tool-pill" id="uiScreenBtn" title="Share screen" aria-label="Share screen">
+        <i class="ph-bold ph-monitor-arrow-up" id="screenBtnIcon"></i>
+      </button>
 
-    <!-- 4. Mic toggle -->
-    <button class="tool-btn" id="uiMicBtn" title="Toggle microphone" aria-label="Toggle microphone" disabled>
-      <i class="ph-bold ph-microphone" style="font-size:21px;"></i>
-    </button>
+      <!-- Microphone (starts disabled; enabled on connect) -->
+      <button class="tool-pill" id="uiMicBtn" title="Toggle microphone" aria-label="Toggle microphone" disabled>
+        <i class="ph-bold ph-microphone" id="micBtnIcon"></i>
+      </button>
 
-    <!-- 5. Settings -->
-    <button class="tool-btn" id="uiSettingsBtn" title="Settings" aria-label="Settings">
-      <i class="ph-bold ph-gear" style="font-size:21px;"></i>
-    </button>
-  </div>
+      <!-- Settings -->
+      <button class="tool-pill" id="uiSettingsBtn" title="Settings" aria-label="Settings">
+        <i class="ph-bold ph-gear"></i>
+      </button>
+    </div>
 
-  <!-- ════ Invisible JS-wired buttons (unchanged IDs, offscreen) ════ -->
+    <!-- Row 2: Text input + Stop/Connect -->
+    <div class="toolbar-bottom">
+      <div class="text-input-wrap">
+        <button class="text-input-clip" id="uiUploadBtn" title="Attach file" aria-label="Attach file" disabled>
+          <i class="ph-bold ph-paperclip"></i>
+        </button>
+        <input type="text" id="uiTextInput" placeholder="Ask anything" autocomplete="off" autocorrect="off" />
+      </div>
+      <button class="stop-connect-btn state-connect" id="uiConnectBtn" aria-label="Connect">
+        <i class="ph-bold ph-plug-charging" style="font-size:17px;"></i><span>Connect</span>
+      </button>
+    </div>
+
+  </div><!-- /.toolbar -->
+
+  <!-- Hidden JS-wired buttons (unchanged IDs, offscreen) -->
+  <button class="js-btn" id="uiEndBtn">End</button>
+  <input type="file" id="fileInput" style="display:none" accept="image/*,audio/*,video/*,application/pdf,text/*,application/json,application/javascript" />
+
+  <!-- ════ Invisible JS-wired buttons (unchanged IDs, still needed) ════ -->
   <button class="js-btn" id="connectBtn">Connect</button>
   <button class="js-btn" id="disconnectBtn">Disconnect</button>
   <button class="js-btn" id="startMicBtn">Start mic</button>
@@ -2360,20 +2666,33 @@ body {
 ════════════════════════════════════════ -->
 <script>
 (function() {
-  var _micOn = false;
-  var _camOn = false;
+  var _micOn    = false;
+  var _camOn    = false;
+  var _connected = false;
+  var _sessionStart = null;
+  var _firstMessage = true; // Track first transcript entry
 
   var uiMicBtn    = document.getElementById('uiMicBtn');
   var uiCamBtn    = document.getElementById('uiCamBtn');
   var uiUploadBtn = document.getElementById('uiUploadBtn');
   var fileInput   = document.getElementById('fileInput');
   var uiConnBtn   = document.getElementById('uiConnectBtn');
-  var uiEndBtn    = document.getElementById('uiEndBtn');
+  var uiScreenBtn = document.getElementById('uiScreenBtn');
   var uiSettBtn   = document.getElementById('uiSettingsBtn');
   var panel       = document.getElementById('settingsPanel');
   var overlay     = document.getElementById('sheetOverlay');
   var drag        = document.getElementById('sheetDrag');
   var camPreview  = document.getElementById('cameraPreview');
+  var textInput   = document.getElementById('uiTextInput');
+
+  // ── Screen share: always visible; dimmed + inert on mobile (no getDisplayMedia) ──
+  var _screenDesktopOnly = !(navigator.mediaDevices && typeof navigator.mediaDevices.getDisplayMedia === 'function');
+  if (_screenDesktopOnly) {
+    uiScreenBtn.classList.add('screen-desktop-only');
+    uiScreenBtn.setAttribute('title', 'Screen sharing — desktop browsers only');
+    uiScreenBtn.setAttribute('aria-label', 'Screen sharing (desktop only)');
+  }
+  var _screenOn = false;
 
   function openPanel()  { panel.classList.add('open'); document.body.classList.add('settings-open'); }
   function closePanel() { panel.classList.remove('open'); document.body.classList.remove('settings-open'); }
@@ -2382,180 +2701,357 @@ body {
   overlay.onclick   = closePanel;
   drag.onclick      = closePanel;
 
-  var _sessionStart = null;
+  // ── Connect / Disconnect toggle (single button) ──
+  function setConnectBtnState(connected) {
+    _connected = connected;
+    if (connected) {
+      uiConnBtn.className = 'stop-connect-btn state-stop';
+      uiConnBtn.innerHTML =
+        '<div class="stop-wave"><span></span><span></span><span></span><span></span><span></span></div>Stop';
+    } else {
+      uiConnBtn.className = 'stop-connect-btn state-connect';
+      uiConnBtn.innerHTML = '<i class="ph-bold ph-plug-charging" style="font-size:17px;"></i>Connect';
+    }
+    // Re-evaluate send-swap in case text is present
+    _refreshConnectOrSend();
+  }
+
+  // ── Send-arrow swap: show ➜ arrow when text is present ──
+  var _prevConnState = null; // 'state-connect' | 'state-stop'
+
+  function _refreshConnectOrSend() {
+    var hasText = textInput.value.trim().length > 0;
+    if (hasText) {
+      // Remember current real state if not already in send mode
+      if (!uiConnBtn.classList.contains('state-send')) {
+        _prevConnState = _connected ? 'state-stop' : 'state-connect';
+      }
+      uiConnBtn.className = 'stop-connect-btn state-send';
+      uiConnBtn.innerHTML = '<i class="ph-bold ph-arrow-up" style="font-size:20px;"></i>';
+      uiConnBtn.style.width = '56px';
+      uiConnBtn.style.padding = '0';
+      uiConnBtn.style.justifyContent = 'center';
+    } else {
+      // Restore previous real state
+      uiConnBtn.style.width = '';
+      uiConnBtn.style.padding = '';
+      uiConnBtn.style.justifyContent = '';
+      if (_prevConnState === 'state-stop' || _connected) {
+        setConnectBtnStateRaw(true);
+      } else {
+        setConnectBtnStateRaw(false);
+      }
+    }
+  }
+
+  // Raw setter (no re-evaluate loop)
+  function setConnectBtnStateRaw(connected) {
+    if (connected) {
+      uiConnBtn.className = 'stop-connect-btn state-stop';
+      uiConnBtn.innerHTML =
+        '<div class="stop-wave"><span></span><span></span><span></span><span></span><span></span></div>Stop';
+    } else {
+      uiConnBtn.className = 'stop-connect-btn state-connect';
+      uiConnBtn.innerHTML = '<i class="ph-bold ph-plug-charging" style="font-size:17px;"></i>Connect';
+    }
+  }
+
+  textInput.addEventListener('input', _refreshConnectOrSend);
 
   uiConnBtn.onclick = function() {
-    _sessionStart = Date.now();
-    document.getElementById('connectBtn').click();
-    dismissConnectHint();
-    closePanel();
+    // ── Send mode ──
+    if (uiConnBtn.classList.contains('state-send')) {
+      var text = textInput.value.trim();
+      if (!text) return;
+      textInput.value = '';
+      _refreshConnectOrSend();
+      document.body.classList.add('chat-active'); // ensure transcript shows
+      if (!_connected) {
+        _sessionStart = Date.now();
+        document.getElementById('connectBtn').click();
+        dismissConnectHint();
+        var pendingText = text;
+        window.addEventListener('app-ws-connected', function _onceConn() {
+          window.removeEventListener('app-ws-connected', _onceConn);
+          var attempts = 0;
+          var poll = setInterval(function() {
+            if (window.app && window.app.setupComplete) {
+              clearInterval(poll);
+              madeonicSendText(pendingText);
+            } else if (++attempts > 40) clearInterval(poll);
+          }, 100);
+        });
+      } else {
+        madeonicSendText(text);
+      }
+      return;
+    }
+
+    // ── Normal connect / stop ──
+    if (!_connected) {
+      _sessionStart = Date.now();
+      document.getElementById('connectBtn').click();
+      dismissConnectHint();
+      closePanel();
+    } else {
+      document.getElementById('disconnectBtn').click();
+      var toast = document.getElementById('disconnectToast');
+      var sub = document.getElementById('ndSessionDuration');
+      if (_sessionStart) {
+        var secs = Math.round((Date.now() - _sessionStart) / 1000);
+        var mins = Math.floor(secs / 60); var s = secs % 60;
+        sub.textContent = mins > 0 ? mins + 'm ' + s + 's session' : secs + 's session';
+        _sessionStart = null;
+      } else { sub.textContent = 'Disconnected'; }
+      toast.querySelectorAll('.nd-icon-btn').forEach(function(b) { b.style.color = ''; });
+      toast.classList.add('visible');
+      clearTimeout(window._ndToastTimer);
+      window._ndToastTimer = setTimeout(function() { toast.classList.remove('visible'); }, 8000);
+    }
   };
 
-  // Auto-start mic after WebSocket is actually open (fixes race-condition bug)
+  // ── Text input: send on Enter ──
+  textInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      var text = textInput.value.trim();
+      if (!text) return;
+      textInput.value = '';
+      _refreshConnectOrSend();
+      document.body.classList.add('chat-active');
+      if (!_connected) {
+        _sessionStart = Date.now();
+        document.getElementById('connectBtn').click();
+        dismissConnectHint();
+        var pendingText = text;
+        window.addEventListener('app-ws-connected', function _onceConnected() {
+          window.removeEventListener('app-ws-connected', _onceConnected);
+          var attempts = 0;
+          var poll = setInterval(function() {
+            if (window.app && window.app.setupComplete) {
+              clearInterval(poll);
+              madeonicSendText(pendingText);
+            } else if (++attempts > 40) clearInterval(poll);
+          }, 100);
+        });
+        return;
+      }
+      madeonicSendText(text);
+    }
+  });
+
+  // Global text send function
+  window.madeonicSendText = function(text) {
+    if (!window.app || !window.app.setupComplete) return;
+    document.body.classList.add('chat-active'); // show transcript
+    if (window.app._appendTranscript) {
+      window.app._appendTranscript('user', text);
+    }
+    window.app._send({ realtimeInput: { text: text } });
+    window.app._log('Text sent: ' + text.substring(0, 40), 'ok');
+  };
+
+  // ── Auto-connect events ──
   window.addEventListener('app-ws-connected', function() {
-    // Unlock mic, cam, upload buttons
     uiMicBtn.disabled    = false;
     uiCamBtn.disabled    = false;
     uiUploadBtn.disabled = false;
-    // Mark body as connected → hides alwaysToast + connectHintToast immediately
     document.body.classList.add('connected');
-    // Poll until setupComplete is true (set synchronously in _sendSetup)
+    setConnectBtnState(true);
+    // Poll until setupComplete → auto-start mic
     var attempts = 0;
     var poll = setInterval(function() {
       attempts++;
-      var appReady = window.app && window.app.setupComplete;
-      if (appReady && !_micOn) {
+      if (window.app && window.app.setupComplete && !_micOn) {
         clearInterval(poll);
         document.getElementById('startMicBtn').click();
         _micOn = true;
         uiMicBtn.classList.add('mic-on');
-      } else if (attempts > 30) {
-        clearInterval(poll); // Give up after 3s
-      }
+        document.getElementById('micBtnIcon').className = 'ph-fill ph-microphone';
+      } else if (attempts > 30) clearInterval(poll);
     }, 100);
   });
 
-  uiEndBtn.onclick = function() {
-    document.getElementById('disconnectBtn').click();
-    // Show disconnect toast with session duration
-    var toast = document.getElementById('disconnectToast');
-    var sub = document.getElementById('ndSessionDuration');
-    if (_sessionStart) {
-      var secs = Math.round((Date.now() - _sessionStart) / 1000);
-      var mins = Math.floor(secs / 60);
-      var s = secs % 60;
-      sub.textContent = mins > 0 ? mins + 'm ' + s + 's session' : secs + 's session';
-      _sessionStart = null;
-    } else {
-      sub.textContent = 'Disconnected';
-    }
-    // Reset thumb colors
-    toast.querySelectorAll('.nd-icon-btn').forEach(function(b) { b.style.color = ''; });
-    toast.classList.add('visible');
-    // Auto-hide after 8s
-    clearTimeout(window._ndToastTimer);
-    window._ndToastTimer = setTimeout(function() { toast.classList.remove('visible'); }, 8000);
+  // ── End session (uiEndBtn hidden, now handled by connect btn) ──
+  document.getElementById('uiEndBtn').onclick = function() {
+    uiConnBtn.click(); // delegate to connect toggle
   };
 
   window.addEventListener('app-reset-ui', function() {
-    if (_micOn) { _micOn = false; uiMicBtn.classList.remove('mic-on'); }
+    if (_micOn) { _micOn = false; uiMicBtn.classList.remove('mic-on'); document.getElementById('micBtnIcon').className = 'ph-bold ph-microphone'; }
     if (_camOn) { _camOn = false; uiCamBtn.classList.remove('cam-on'); camPreview.classList.remove('pip-on'); }
-    // Re-lock buttons until next connect
+    if (_screenOn) {
+      _screenOn = false;
+      uiScreenBtn.classList.remove('screen-on');
+      document.getElementById('screenBtnIcon').className = 'ph-bold ph-monitor-arrow-up';
+    }
     uiMicBtn.disabled    = true;
     uiCamBtn.disabled    = true;
     uiUploadBtn.disabled = true;
-    // Remove connected state → restore alwaysToast visibility
     document.body.classList.remove('connected');
+    // ── Bug 1 fix: clear _prevConnState so _refreshConnectOrSend doesn't
+    //    misread it and restore Stop instead of Connect after disconnect ──
+    _prevConnState = null;
+    _connected = false;
+    setConnectBtnState(false);
+    _firstMessage = true; // reset so Today header re-injects on next session
   });
 
+  // ── Mic button ──
   uiMicBtn.onclick = function() {
+    if (!_connected) {
+      // Not connected — connect (mic auto-starts after)
+      uiConnBtn.click();
+      return;
+    }
     if (!_micOn) {
-      var statusText = document.getElementById('statusText');
-      if (statusText && statusText.textContent === 'Disconnected') {
-        // Not connected — trigger connect; mic will auto-start via app-ws-connected
-        uiConnBtn.click();
-        return;
-      }
       document.getElementById('startMicBtn').click();
       _micOn = true;
       uiMicBtn.classList.add('mic-on');
+      document.getElementById('micBtnIcon').className = 'ph-fill ph-microphone';
     } else {
-      // Stopping mic does NOT disconnect
       document.getElementById('stopMicBtn').click();
       _micOn = false;
       uiMicBtn.classList.remove('mic-on');
+      document.getElementById('micBtnIcon').className = 'ph-bold ph-microphone';
     }
   };
 
+  // ── Camera button ──
   uiCamBtn.onclick = function() {
     if (!_camOn) {
       document.getElementById('startCamBtn').click();
       _camOn = true;
       uiCamBtn.classList.add('cam-on');
-      camPreview.classList.add('pip-on');
     } else {
       document.getElementById('stopCamBtn').click();
       _camOn = false;
       uiCamBtn.classList.remove('cam-on');
-      camPreview.classList.remove('pip-on');
     }
   };
 
-  uiUploadBtn.onclick = function() {
-    fileInput.click();
+  // ── Screen share button ──
+  uiScreenBtn.onclick = function() {
+    // Mobile / no getDisplayMedia — button is visible but non-functional
+    if (_screenDesktopOnly) return;
+
+    if (!_screenOn) {
+      if (!window.app) return;
+      window.app.startScreenShare().then(function(ok) {
+        if (ok) {
+          _screenOn = true;
+          uiScreenBtn.classList.add('screen-on');
+          document.getElementById('screenBtnIcon').className = 'ph-fill ph-monitor-arrow-up';
+        }
+      }).catch(function() {});
+    } else {
+      if (window.app) window.app.stopScreenShare();
+      _screenOn = false;
+      uiScreenBtn.classList.remove('screen-on');
+      document.getElementById('screenBtnIcon').className = 'ph-bold ph-monitor-arrow-up';
+    }
   };
 
+  // ── Screen share: reset UI if user stops via browser native UI ──
+  window.addEventListener('app-screen-ended', function() {
+    _screenOn = false;
+    uiScreenBtn.classList.remove('screen-on');
+    document.getElementById('screenBtnIcon').className = 'ph-bold ph-monitor-arrow-up';
+  });
+
+  // ── File upload ──
+  uiUploadBtn.onclick = function() { fileInput.click(); };
   fileInput.onchange = function() {
     if (fileInput.files.length > 0) {
-      // Direct call to App instance via its exposure or custom event
       window.dispatchEvent(new CustomEvent('app-upload-file', { detail: fileInput.files[0] }));
-      fileInput.value = ""; // Clear for next upload
+      fileInput.value = '';
     }
+  };
+
+  // ── "Today" header injection before first transcript message ──
+  window._injectTodayHeader = function() {
+    if (!_firstMessage) return;
+    _firstMessage = false;
+    var transcript = document.getElementById('transcriptContainer');
+    if (!transcript) return;
+    var divider = document.createElement('div');
+    divider.className = 'chat-day-divider';
+    divider.innerHTML =
+      '<div class="chat-day-row">' +
+        '<span class="chat-day-label">Today</span>' +
+        '<div class="chat-day-line"></div>' +
+      '</div>' +
+      '<p class="chat-disclaimer">Madeonic is an AI and may make mistakes. Your ' +
+        '<a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener noreferrer">conversation activity</a>' +
+        ', which now includes content you share, helps train AI. ' +
+        '<a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener noreferrer">Opt out</a>' +
+      '</p>';
+    transcript.insertBefore(divider, transcript.firstChild);
   };
 
   // ── Connect Hint Toast Logic ──
   window.dismissConnectHint = function() {
     var toast = document.getElementById('connectHintToast');
-    if (toast) {
-      toast.classList.remove('visible');
-      sessionStorage.setItem('hint_dismissed', '1');
-    }
+    if (toast) { toast.classList.remove('visible'); sessionStorage.setItem('hint_dismissed', '1'); }
   };
 
-  // Auto-show toast after 1.8s if not dismissed this session
   (function initConnectHint() {
     if (sessionStorage.getItem('hint_dismissed')) return;
     var toast = document.getElementById('connectHintToast');
     if (!toast) return;
-
-    // Typing-effect messages cycled every 4s
     var messages = [
-      { title: 'Tap to connect', sub: 'Tap the plug icon below to begin' },
-      { title: 'Ready when you are', sub: 'Hit connect to wake Madeonic up' },
+      { title: 'Tap to connect', sub: 'Tap Connect below to begin' },
+      { title: 'Ready when you are', sub: 'Hit Connect to wake Madeonic up' },
       { title: 'Start a conversation', sub: 'Connect → mic turns on automatically' }
     ];
     var msgIdx = 0;
     var titleEl = document.getElementById('hintTitle');
     var subEl   = document.getElementById('hintSub');
-
     function cycleMessage() {
       if (!toast.classList.contains('visible')) return;
       msgIdx = (msgIdx + 1) % messages.length;
-      titleEl.style.opacity = '0';
-      subEl.style.opacity   = '0';
+      titleEl.style.opacity = '0'; subEl.style.opacity = '0';
       setTimeout(function() {
         titleEl.innerHTML = messages[msgIdx].title + ' <span class="hint-dots"><span></span><span></span><span></span></span>';
-        subEl.textContent  = messages[msgIdx].sub;
-        titleEl.style.opacity = '1';
-        subEl.style.opacity   = '1';
+        subEl.textContent = messages[msgIdx].sub;
+        titleEl.style.opacity = '1'; subEl.style.opacity = '1';
       }, 260);
     }
-
-    // Add transition to text elements
-    if (titleEl) { titleEl.style.transition = 'opacity 0.25s ease'; }
-    if (subEl)   { subEl.style.transition   = 'opacity 0.25s ease'; }
-
+    if (titleEl) titleEl.style.transition = 'opacity 0.25s ease';
+    if (subEl)   subEl.style.transition   = 'opacity 0.25s ease';
     setTimeout(function() {
-      // Only show if not already connected
       var statusText = document.getElementById('statusText');
       if (statusText && statusText.textContent !== 'Disconnected' && statusText.textContent !== '') return;
       toast.classList.add('visible');
-      // Cycle message every 4s
       var cycleTimer = setInterval(function() {
         if (!toast.classList.contains('visible')) { clearInterval(cycleTimer); return; }
         cycleMessage();
       }, 4000);
     }, 1800);
-
-    // Auto-dismiss when connected
     window.addEventListener('app-ws-connected', function() {
       toast.classList.remove('visible');
       sessionStorage.setItem('hint_dismissed', '1');
-      // Hide disconnectToast on reconnect
       var dt = document.getElementById('disconnectToast');
       if (dt) dt.classList.remove('visible');
     });
   })();
+
+  // ── Info tooltip for transcription ──
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.transcription-info-btn');
+    if (btn) {
+      e.stopPropagation();
+      var tip = btn.parentElement.querySelector('.transcription-info-tip');
+      if (!tip) return;
+      var isOpen = tip.classList.contains('show');
+      // Close all open tips first
+      document.querySelectorAll('.transcription-info-tip.show').forEach(function(t) { t.classList.remove('show'); });
+      if (!isOpen) tip.classList.add('show');
+    } else {
+      document.querySelectorAll('.transcription-info-tip.show').forEach(function(t) { t.classList.remove('show'); });
+    }
+  });
+
 })();
 </script>
 
@@ -2715,6 +3211,8 @@ If the user asks about your technical details, Madeon, or Madesholic Research La
       this.currentAiMsgEl = null;
       this._initCameraInteractions();
       this._initStatusPill();
+      // Set initial Offline state on the pill
+      setTimeout(() => { this._updatePillState('offline'); }, 50);
     this.player = new Player()
     this.resumeHandle = "";
     this.retryCount = 0;
@@ -3117,26 +3615,71 @@ async uploadFile(file) {
         const active = this.ws && this.ws.readyState === WebSocket.OPEN;
         const mic = this.micActive;
         const cam = this.camActive;
-        
+
         let totalBoost = 0;
-        bars.forEach((bar, i) => {
-          const base = 8 + i * 1.2;
-          const jitter = active ? Math.random() * 28 : Math.random() * 8;
-          const boost = (mic ? 10 : 0) + (cam ? 6 : 0);
-          const height = Math.max(6, base + jitter + boost * (i % 2 ? .55 : 1));
-          bar.style.height = height + "px";
-          totalBoost += (active ? (jitter + boost) : 0);
-        });
+
+        if (mic && this.micAnalyser && this._micFreqData) {
+          // ── REAL mic path: read frequency data from AnalyserNode ──
+          this.micAnalyser.getByteFrequencyData(this._micFreqData);
+          const binCount = this._micFreqData.length;
+
+          bars.forEach((bar, i) => {
+            const binIdx = Math.floor((i / bars.length) * (binCount * 0.6)); // use lower 60% of spectrum (voice range)
+            const amplitude = this._micFreqData[binIdx] / 255; // 0→1
+            const height = 6 + amplitude * 52;
+            bar.style.height = height + 'px';
+            totalBoost += amplitude;
+          });
+
+          // ── Drive the stop-wave spans in the button with real mic data ──
+          const stopWaveSpans = document.querySelectorAll('.stop-wave span');
+          if (stopWaveSpans.length) {
+            const step = Math.floor(binCount / stopWaveSpans.length);
+            stopWaveSpans.forEach((span, i) => {
+              const binIdx = Math.min(i * step, binCount - 1);
+              const amplitude = this._micFreqData[binIdx] / 255;
+              const h = 3 + amplitude * 19; // 3px→22px — matches the button height container
+              span.style.height = h + 'px';
+              span.style.animation = 'none'; // override CSS animation; JS is in control
+              span.style.transform = 'scaleY(1)';
+              span.style.opacity = '0.55 + ' + (amplitude * 0.45);
+            });
+          }
+
+          this.bgVolume = totalBoost / Math.max(1, bars.length);
+
+        } else {
+          // ── FALLBACK: smooth idle animation when mic is off ──
+          bars.forEach((bar, i) => {
+            const base = 8 + i * 1.2;
+            const jitter = active ? Math.random() * 28 : Math.random() * 8;
+            const boost = cam ? 6 : 0;
+            const height = Math.max(6, base + jitter + boost * (i % 2 ? 0.55 : 1));
+            bar.style.height = height + 'px';
+            totalBoost += active ? (jitter + boost) : 0;
+          });
+
+          // ── Restore CSS animation on stop-wave spans when mic is off ──
+          const stopWaveSpans = document.querySelectorAll('.stop-wave span');
+          if (stopWaveSpans.length) {
+            stopWaveSpans.forEach(span => {
+              span.style.height = '';
+              span.style.animation = '';
+              span.style.transform = '';
+              span.style.opacity = '';
+            });
+          }
+
+          this.bgVolume = active ? (totalBoost / 200) : 0;
+        }
 
         // ── Mascot Reactivity ──
-        this.bgVolume = active ? (totalBoost / 200) : 0;
         const gif = document.getElementById('reactiveGif');
-
         if (active && this.bgVolume > 0.01) {
           if (gif) {
             gif.classList.add('visible');
-            gif.style.transform = `translateX(-50%) scale(1)`; 
-            gif.style.filter = `grayscale(0)`; 
+            gif.style.transform = `translateX(-50%) scale(1)`;
+            gif.style.filter = `grayscale(0)`;
           }
         } else {
           if (gif) {
@@ -3186,10 +3729,14 @@ _setStatus(kind, text) {
         Teaching: { color: '#818cf8', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773579/kggktavhlg6yc20fuftn.png', pal: ['#eef2ff','#e0e7ff','#c7d2fe','#a5b4fc','#ffffff'] },
         Brainstorming: { color: '#fb923c', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773578/hfikzaxdxl5o2dtqvbaj.png', pal: ['#fff7ed','#ffedd5','#fed7aa','#fdba74','#ffffff'] },
         Elevating: { color: '#f472b6', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773578/rftorpw4x4nkcemokulx.png', pal: ['#fdf2f8','#fce7f3','#fbcfe8','#f9a8d4','#ffffff'] },
-        Muted: { color: '#94a3b8', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773580/xhtozvje43ofyalumqjl.png', pal: ['#f8fafc','#f1f5f9','#e2e8f0','#cbd5e1','#ffffff'] }
+        Muted: { color: '#94a3b8', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773580/xhtozvje43ofyalumqjl.png', pal: ['#f8fafc','#f1f5f9','#e2e8f0','#cbd5e1','#ffffff'] },
+        // ── New states ──
+        Offline: { color: '#94a3b8', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773580/xhtozvje43ofyalumqjl.png', pal: ['#f8fafc','#f1f5f9','#e8edf5','#dde4ee','#ffffff'] },
+        Ended:   { color: '#f87171', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773580/xhtozvje43ofyalumqjl.png', pal: ['#fff5f5','#fee2e2','#fecaca','#fca5a5','#ffffff'] },
+        GoAhead: { color: '#4ade80', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773580/xhtozvje43ofyalumqjl.png', pal: ['#f0fdf4','#dcfce7','#bbf7d0','#86efac','#ffffff'] }
       };
 
-      this.currentPillState = 'Listening';
+      this.currentPillState = 'Offline';
       const grid = document.getElementById('pillGrid');
       for (let i = 0; i < 36; i++) {
         const div = document.createElement('div');
@@ -3206,16 +3753,14 @@ _setStatus(kind, text) {
         this.pillDustParticles.push({ el: p, x: Math.random()*100, y: Math.random()*100, vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.4 });
       }
 
-      // Performance Optimized Animation Loop
+      // Performance Optimized Animation Loop — always running
       let lastPixelUpdate = 0;
       const animatePill = (time) => {
-        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-          if (time - lastPixelUpdate > 120) {
-            this._updatePillPixels();
-            lastPixelUpdate = time;
-          }
-          this._updatePillDust();
+        if (time - lastPixelUpdate > 120) {
+          this._updatePillPixels();
+          lastPixelUpdate = time;
         }
+        this._updatePillDust();
         requestAnimationFrame(animatePill);
       };
       requestAnimationFrame(animatePill);
@@ -3248,32 +3793,42 @@ _setStatus(kind, text) {
     }
 
     _updatePillState(kind) {
-      const capsule = document.getElementById('statusCapsule');
       const label = document.getElementById('pillLabel');
       const icon = document.getElementById('pillIcon');
       
       let nextState = 'Listening';
 
-      if (kind === 'speaking') {
+      if (kind === 'offline') {
+        nextState = 'Offline';
+      } else if (kind === 'ended') {
+        nextState = 'Ended';
+      } else if (kind === 'goahead') {
+        nextState = 'GoAhead';
+      } else if (kind === 'speaking') {
         const variations = ['Speaking', 'Brainstorming', 'Teaching', 'Solving', 'Elevating', 'Thinking'];
         nextState = variations[Math.floor(Date.now() / 4000) % variations.length];
       } else if (kind === 'searching') {
         nextState = 'Searching';
-      } else if (kind === 'listening' || nextState === 'Listening') {
-        // Show Muted if mic is not active
+      } else if (kind === 'listening') {
         nextState = this.micActive ? 'Listening' : 'Muted';
+      } else if (kind === 'warn') {
+        nextState = 'Muted'; // Connecting/reconnecting
+      } else if (kind === 'bad') {
+        nextState = 'Offline';
+      } else if (kind === 'on') {
+        nextState = 'Listening'; // Mic just activated — show Listening
+      } else {
+        nextState = 'Offline';
       }
 
-      const isLive = this.ws && this.ws.readyState === WebSocket.OPEN;
-      capsule.classList.toggle('active', isLive);
-      if (!isLive || this.currentPillState === nextState) return;
+      if (this.currentPillState === nextState) return;
 
       label.classList.add('text-swap-pill');
       icon.classList.add('icon-swap-pill');
 
       setTimeout(() => {
         this.currentPillState = nextState;
-        label.textContent = nextState;
+        label.textContent = nextState === 'GoAhead' ? 'Go Ahead' : nextState;
         icon.src = this.pillStates[nextState].icon;
         label.classList.remove('text-swap-pill');
         icon.classList.remove('icon-swap-pill');
@@ -3372,7 +3927,13 @@ async _parsePdf(file) {
       this.ws.onopen = async () => {
         try { await this.player.resume(); } catch {}
         this._log("WebSocket opened.", "ok");
-        this._setStatus("listening", "Connected"); 
+        // Flash "Go Ahead" for 1 second to confirm connection, then settle to Listening
+        this._setStatus("goahead", "Go Ahead");
+        setTimeout(() => {
+          if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            this._setStatus("listening", "Listening");
+          }
+        }, 1000);
         this._sendSetup();
         // Notify UI glue: WS is truly open → auto-start mic
         window.dispatchEvent(new CustomEvent('app-ws-connected'));
@@ -3401,7 +3962,7 @@ async _parsePdf(file) {
           this._setStatus("warn", "Reconnecting…");
           this._scheduleReconnect();
         } else {
-          this._setStatus("", "Disconnected");
+          this._setStatus("ended", "Ended");
         }
       };
     }
@@ -4203,17 +4764,18 @@ _renderMap(args) {
     }
 
 _appendTranscript(role, text, isStreaming = false) {
+      // ── Inject "Today" header before very first message ──
+      if (typeof window._injectTodayHeader === 'function') window._injectTodayHeader();
+
       if (role === "user") {
         this.currentAiMsgEl = null;
         const wrapper = document.createElement("div");
-        wrapper.className = "msg user-row"; // 'msg' provides the animation & sizing
-        
-        // GIF is placed OUTSIDE the bubble, old mic icon restored INSIDE
+        wrapper.className = "msg user-row";
         wrapper.innerHTML = `
           <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663498817059/AKTixhipbvhUcFPx.gif" class="user-gif-icon" alt="Mic">
           <div class="msg-user">
             <i class="ph-fill ph-microphone-stage user-icon"></i>
-            <span>${text}</span>
+            <span>${text}</span><span class="transcription-info-wrap"><button class="transcription-info-btn" aria-label="Transcription info"><i class="ph ph-info"></i></button><span class="transcription-info-tip">Transcription may be wrong.<br>This doesn't affect the answer.</span></span>
           </div>
         `;
         els.transcript.appendChild(wrapper);
@@ -4238,8 +4800,11 @@ _appendTranscript(role, text, isStreaming = false) {
             <div class="text-content"><span class="reading">${text}</span></div>
             <div class="ai-actions">
               ${sourcesBtn}
-              <i class="ph-bold ph-thumbs-up" style="font-size:18px; cursor:pointer; color:#a0a0b0; transition:color 0.2s;" onmouseover="this.style.color='#1a1a2e'" onmouseout="this.style.color='#a0a0b0'"></i>
-              <i class="ph-bold ph-thumbs-down" style="font-size:18px; cursor:pointer; color:#a0a0b0; transition:color 0.2s;" onmouseover="this.style.color='#1a1a2e'" onmouseout="this.style.color='#a0a0b0'"></i>
+              <button class="gen-action-btn" title="Copy response" onclick="madeonicCopyText(this)"><i class="ph ph-copy"></i></button>
+              <button class="gen-action-btn" title="Report a bug" onclick="madeonicOpenFeedback('bug', this)"><i class="ph ph-bug"></i></button>
+              <button class="gen-action-btn speak-btn" title="Read aloud" onclick="madeonicSpeak(this)"><i class="ph ph-speaker-high"></i></button>
+              <button class="gen-action-btn like-btn" title="Good response" onclick="madeonicLike(this)"><i class="ph ph-thumbs-up"></i></button>
+              <button class="gen-action-btn dislike-btn" title="Bad response" onclick="madeonicOpenFeedback('dislike', this)"><i class="ph ph-thumbs-down"></i></button>
             </div>
           `;
           els.transcript.appendChild(div);
@@ -4316,7 +4881,7 @@ _appendTranscript(role, text, isStreaming = false) {
       this._syncUI();
       if (this.retryCount > 8) {
         this._log("Reconnect limit reached.", "err");
-        this._setStatus("bad", "Reconnect stopped");
+        this._setStatus("bad", "Offline");
         return;
       }
       const delay = Math.min(15000, 700 * Math.pow(1.8, this.retryCount - 1));
@@ -4336,6 +4901,13 @@ _appendTranscript(role, text, isStreaming = false) {
         });
         this.micCtx = new (window.AudioContext || window.webkitAudioContext)();
         this.micSource = this.micCtx.createMediaStreamSource(this.micStream);
+
+        // ── Real mic analyser for waveform visualisation ──
+        this.micAnalyser = this.micCtx.createAnalyser();
+        this.micAnalyser.fftSize = 64;
+        this.micAnalyser.smoothingTimeConstant = 0.75;
+        this._micFreqData = new Uint8Array(this.micAnalyser.frequencyBinCount);
+        this.micSource.connect(this.micAnalyser); // branch — observation only, not to destination
 
         const workletCode = `
           class PCM16Resampler extends AudioWorkletProcessor {
@@ -4422,6 +4994,10 @@ _appendTranscript(role, text, isStreaming = false) {
       try { this.worklet?.disconnect(); } catch {}
       try { this.micSource?.disconnect(); } catch {}
       try { this.sink?.disconnect(); } catch {}
+      // ── Clean up analyser ──
+      try { this.micAnalyser?.disconnect(); } catch {}
+      this.micAnalyser = null;
+      this._micFreqData = null;
       if (this.micStream) {
         this.micStream.getTracks().forEach(t => t.stop());
         this.micStream = null;
@@ -4434,8 +5010,8 @@ _appendTranscript(role, text, isStreaming = false) {
       this.micSource = null;
       this.sink = null;
       this._log("Mic stopped.", "sys");
-      if (this.ws && this.ws.readyState === WebSocket.OPEN) this._setStatus("on", "Connected");
-      else this._setStatus("", "Disconnected");
+      if (this.ws && this.ws.readyState === WebSocket.OPEN) this._setStatus("listening", "Muted");
+      else this._setStatus("offline", "Offline");
     }
 
     async startCamera() {
@@ -4579,6 +5155,144 @@ async _sendCurrentFrame() {
       this._syncUI();
     }
 
+    // ── Screen Share ──
+    async startScreenShare() {
+      if (!navigator.mediaDevices || typeof navigator.mediaDevices.getDisplayMedia !== 'function') {
+        this._log("Screen share not supported in this browser.", "err");
+        return false;
+      }
+      if (!this.ws || this.ws.readyState !== WebSocket.OPEN || !this.setupComplete) {
+        this._log("Connect before sharing screen.", "err");
+        return false;
+      }
+      try {
+        // Keep constraints minimal — avoids InvalidConstraint errors across browsers.
+        // We capture at 1fps via setTimeout, so there's no value in requesting a higher framerate.
+        this.screenStream = await navigator.mediaDevices.getDisplayMedia({
+          video: true,
+          audio: false
+        });
+
+        const tracks = this.screenStream.getVideoTracks();
+        if (!tracks.length) {
+          this._log("Screen stream has no video tracks.", "err");
+          this.screenStream.getTracks().forEach(t => t.stop());
+          this.screenStream = null;
+          return false;
+        }
+
+        // When user stops share via the browser's native UI, clean up
+        tracks[0].addEventListener('ended', () => {
+          this.stopScreenShare();
+          const btn  = document.getElementById('uiScreenBtn');
+          const icon = document.getElementById('screenBtnIcon');
+          if (btn)  btn.classList.remove('screen-on');
+          if (icon) icon.className = 'ph-bold ph-monitor-arrow-up';
+          window.dispatchEvent(new CustomEvent('app-screen-ended'));
+        });
+
+        // Create a hidden video element to draw from
+        this.screenVideo = document.createElement('video');
+        this.screenVideo.srcObject = this.screenStream;
+        this.screenVideo.muted = true;
+        this.screenVideo.playsInline = true;
+
+        // Wait for metadata so videoWidth/videoHeight are valid before building canvas
+        await new Promise((resolve) => {
+          if (this.screenVideo.readyState >= 1) { resolve(); return; }
+          this.screenVideo.onloadedmetadata = resolve;
+          setTimeout(resolve, 3000); // fallback: 3s timeout
+        });
+
+        try {
+          await this.screenVideo.play();
+        } catch (playErr) {
+          this._log("Screen video play failed: " + playErr.message, "err");
+          this.screenStream.getTracks().forEach(t => t.stop());
+          this.screenStream = null;
+          this.screenVideo = null;
+          return false;
+        }
+
+        // Build canvas at actual video dimensions, scaled down to stay within API limits
+        const vw    = this.screenVideo.videoWidth  || 1280;
+        const vh    = this.screenVideo.videoHeight || 720;
+        const scale = Math.min(1, 1280 / vw, 720 / vh);
+        this.screenCanvas = document.createElement('canvas');
+        this.screenCanvas.width  = Math.round(vw * scale);
+        this.screenCanvas.height = Math.round(vh * scale);
+        // willReadFrequently: true — avoids GPU→CPU readback stall on every toDataURL
+        this.screenCtx = this.screenCanvas.getContext('2d', { willReadFrequently: true });
+
+        this.screenActive  = true;
+        this.screenLoopVer = (this.screenLoopVer || 0) + 1;
+        this._scheduleScreenFrame(this.screenLoopVer);
+        this._log(`Screen share active (${this.screenCanvas.width}×${this.screenCanvas.height}).`, "ok");
+        return true;
+
+      } catch (e) {
+        // User cancelled the picker (NotAllowedError / AbortError) — not a real error
+        if (e.name === 'NotAllowedError' || e.name === 'AbortError') {
+          this._log("Screen share cancelled by user.", "sys");
+        } else {
+          this._log("Screen share error: " + e.message, "err");
+        }
+        // Clean up any partial state
+        if (this.screenStream) {
+          try { this.screenStream.getTracks().forEach(t => t.stop()); } catch {}
+          this.screenStream = null;
+        }
+        this.screenVideo  = null;
+        this.screenCanvas = null;
+        this.screenCtx    = null;
+        return false;
+      }
+    }
+
+    _scheduleScreenFrame(ver) {
+      if (!this.screenActive || ver !== this.screenLoopVer) return;
+      clearTimeout(this.screenTimer);
+      this.screenTimer = setTimeout(async () => {
+        if (!this.screenActive || ver !== this.screenLoopVer) return;
+        await this._sendScreenFrame();
+        this._scheduleScreenFrame(ver);
+      }, 1000); // 1fps — same cadence as camera
+    }
+
+    async _sendScreenFrame() {
+      if (!this.screenActive || !this.screenVideo || !this.screenStream) return;
+      if (!this.ws || this.ws.readyState !== WebSocket.OPEN || !this.setupComplete) return;
+      // Ensure video is decoded and has valid dimensions before drawing
+      if (this.screenVideo.readyState < 2 || !this.screenVideo.videoWidth) return;
+      try {
+        this.screenCtx.drawImage(this.screenVideo, 0, 0, this.screenCanvas.width, this.screenCanvas.height);
+        const dataUrl = this.screenCanvas.toDataURL('image/jpeg', 0.6);
+        const base64  = dataUrl ? dataUrl.split(',')[1] : null;
+        if (base64) {
+          this._send({ realtimeInput: { video: { data: base64, mimeType: 'image/jpeg' } } });
+        }
+      } catch (e) {
+        this._log("Screen frame send error: " + e.message, "err");
+      }
+    }
+
+    stopScreenShare() {
+      this.screenActive = false;
+      this.screenLoopVer = (this.screenLoopVer || 0) + 1;
+      clearTimeout(this.screenTimer);
+      if (this.screenStream) {
+        this.screenStream.getTracks().forEach(t => t.stop());
+        this.screenStream = null;
+      }
+      if (this.screenVideo) {
+        this.screenVideo.srcObject = null;
+        this.screenVideo = null;
+      }
+      this.screenCanvas = null;
+      this.screenCtx = null;
+      this._log("Screen share stopped.", "sys");
+    }
+
     async handleVoiceChange(name, btn) {
       // 1. UI Update — btn may be null when called from voice cards
       if (btn) {
@@ -4669,7 +5383,7 @@ async _sendCurrentFrame() {
         this.ws = null;
       }
       this.setupComplete = false;
-      this._setStatus("", "Disconnected");
+      this._setStatus("ended", "Ended");
       this._log("Disconnected by user.", "sys");
     }
 
@@ -5264,6 +5978,211 @@ async _sendCurrentFrame() {
       el.style.display = 'none';
     }
   })();
+</script>
+
+<!-- ════════════════════════════════════════
+     EMBEDDED FEEDBACK MODAL (Dislike / Bug)
+════════════════════════════════════════ -->
+<div id="fbModalBackdrop">
+  <div class="fb-modal" role="dialog" aria-modal="true" aria-labelledby="fb-heading">
+
+    <button class="fb-close" id="fbCloseBtn" aria-label="Close">
+      <i class="ph ph-x"></i>
+    </button>
+
+    <div class="fb-title-row">
+      <h2 id="fb-heading">Submit feedback</h2>
+      <i class="ph ph-thumbs-down" id="fbTitleIcon" aria-hidden="true"></i>
+    </div>
+
+    <div class="fb-success" id="fbSuccess" role="status">
+      <i class="ph ph-check-circle"></i>
+      <span>Feedback submitted — thank you!</span>
+    </div>
+
+    <div class="fb-field-group">
+      <label class="fb-label" for="fbIssueSelect">What type of issue? (optional)</label>
+      <div class="fb-select-wrap">
+        <select id="fbIssueSelect" name="issue">
+          <option value="">Select an issue type</option>
+          <option value="other" selected>Other</option>
+          <option value="harmful">Harmful or unsafe content</option>
+          <option value="incorrect">Incorrect or misleading</option>
+          <option value="hallucination">Hallucination</option>
+          <option value="not-helpful">Not helpful</option>
+          <option value="too-long">Too long or verbose</option>
+          <option value="too-short">Too short or incomplete</option>
+          <option value="formatting">Formatting issue</option>
+          <option value="bug">Technical bug</option>
+        </select>
+        <span class="fb-chevron" aria-hidden="true"><i class="ph ph-caret-down"></i></span>
+      </div>
+    </div>
+
+    <div class="fb-field-group">
+      <label class="fb-label" for="fbDetailsText">Please provide details: (optional)</label>
+      <textarea
+        id="fbDetailsText"
+        class="fb-textarea"
+        name="details"
+        placeholder="What was unsatisfying about this response?"
+        maxlength="2000"
+      ></textarea>
+    </div>
+
+    <p class="fb-disclaimer">
+      Submitting this report will send the current conversation context for review.
+      <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener noreferrer">Learn More</a>
+    </p>
+
+    <button class="fb-submit" id="fbSubmitBtn" type="button">Submit Feedback</button>
+  </div>
+</div>
+
+<script>
+// ── Generation Action Handlers ──
+(function() {
+  var _currentSpeechEl = null;
+  var _currentUtterance = null;
+
+  window.madeonicCopyText = function(btn) {
+    var msgEl = btn.closest('.msg-ai');
+    if (!msgEl) return;
+    var text = msgEl.querySelector('.text-content')?.innerText || '';
+    navigator.clipboard.writeText(text).then(function() {
+      btn.classList.add('copied');
+      var icon = btn.querySelector('i');
+      icon.className = 'ph ph-check';
+      setTimeout(function() {
+        btn.classList.remove('copied');
+        icon.className = 'ph ph-copy';
+      }, 1800);
+    }).catch(function() {});
+  };
+
+  window.madeonicLike = function(btn) {
+    var actionsEl = btn.closest('.ai-actions');
+    // Toggle off if already liked
+    if (btn.classList.contains('liked')) {
+      btn.classList.remove('liked');
+      btn.querySelector('i').className = 'ph ph-thumbs-up';
+      return;
+    }
+    // De-activate dislike in same row
+    var dislikeBtn = actionsEl ? actionsEl.querySelector('.dislike-btn') : null;
+    if (dislikeBtn) {
+      dislikeBtn.classList.remove('disliked');
+      dislikeBtn.querySelector('i').className = 'ph ph-thumbs-down';
+    }
+    btn.classList.add('liked');
+    btn.querySelector('i').className = 'ph-fill ph-thumbs-up';
+  };
+
+  window.madeonicSpeak = function(btn) {
+    var msgEl = btn.closest('.msg-ai');
+    if (!msgEl) return;
+    var text = msgEl.querySelector('.text-content')?.innerText || '';
+
+    // Stop if currently speaking this element
+    if (_currentSpeechEl === btn) {
+      window.speechSynthesis.cancel();
+      _currentSpeechEl = null;
+      btn.classList.remove('speaking');
+      btn.querySelector('i').className = 'ph ph-speaker-high';
+      return;
+    }
+
+    // Stop any active speech
+    if (_currentSpeechEl) {
+      window.speechSynthesis.cancel();
+      _currentSpeechEl.classList.remove('speaking');
+      _currentSpeechEl.querySelector('i').className = 'ph ph-speaker-high';
+      _currentSpeechEl = null;
+    }
+
+    var utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.onend = function() {
+      btn.classList.remove('speaking');
+      btn.querySelector('i').className = 'ph ph-speaker-high';
+      _currentSpeechEl = null;
+    };
+    utterance.onerror = function() {
+      btn.classList.remove('speaking');
+      btn.querySelector('i').className = 'ph ph-speaker-high';
+      _currentSpeechEl = null;
+    };
+
+    _currentSpeechEl = btn;
+    _currentUtterance = utterance;
+    btn.classList.add('speaking');
+    btn.querySelector('i').className = 'ph-fill ph-speaker-high';
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // ── Feedback Modal ──
+  var fbBackdrop  = document.getElementById('fbModalBackdrop');
+  var fbClose     = document.getElementById('fbCloseBtn');
+  var fbSubmit    = document.getElementById('fbSubmitBtn');
+  var fbSuccess   = document.getElementById('fbSuccess');
+  var fbTitleIcon = document.getElementById('fbTitleIcon');
+  var fbHeading   = document.getElementById('fb-heading');
+
+  function openFb(type) {
+    // Reset state
+    fbSuccess.classList.remove('show');
+    fbSubmit.textContent = 'Submit Feedback';
+    fbSubmit.style.background = '';
+    fbSubmit.disabled = false;
+    document.getElementById('fbIssueSelect').value = type === 'bug' ? 'bug' : '';
+    document.getElementById('fbDetailsText').value = '';
+    // Icon & title
+    if (type === 'bug') {
+      fbTitleIcon.className = 'ph ph-bug';
+      fbHeading.textContent = 'Report a bug';
+    } else {
+      fbTitleIcon.className = 'ph ph-thumbs-down';
+      fbHeading.textContent = 'Submit feedback';
+    }
+    fbBackdrop.classList.add('open');
+  }
+
+  function closeFb() {
+    fbBackdrop.classList.remove('open');
+  }
+
+  window.madeonicOpenFeedback = function(type, triggerBtn) {
+    // Mark dislike btn visually
+    if (type === 'dislike' && triggerBtn) {
+      var actionsEl = triggerBtn.closest('.ai-actions');
+      var likeBtn = actionsEl ? actionsEl.querySelector('.like-btn') : null;
+      if (likeBtn) { likeBtn.classList.remove('liked'); likeBtn.querySelector('i').className = 'ph ph-thumbs-up'; }
+      triggerBtn.classList.add('disliked');
+      triggerBtn.querySelector('i').className = 'ph-fill ph-thumbs-down';
+    }
+    openFb(type);
+  };
+
+  fbClose.addEventListener('click', closeFb);
+
+  fbBackdrop.addEventListener('click', function(e) {
+    if (e.target === fbBackdrop) closeFb();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && fbBackdrop.classList.contains('open')) closeFb();
+  });
+
+  fbSubmit.addEventListener('click', function() {
+    fbSuccess.classList.add('show');
+    fbSubmit.textContent = 'Feedback Submitted';
+    fbSubmit.style.background = '#3d3d3b';
+    fbSubmit.disabled = true;
+    setTimeout(closeFb, 2200);
+  });
+})();
 </script>
 
 </body>
