@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Madeonic V2</title>
+  <title>Madeonic V3</title>
   <!-- Background Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Favicons -->
@@ -1624,6 +1624,57 @@ body {
     /* Profile button in settings */
     .s-btn.profile { background: #8c8478; }
     .s-btn.profile:hover { background: #7a7368; }
+    /* ── Username field state styles ── */
+    .profile-field-input.username-ok  { box-shadow: 0 0 0 2px rgba(34,197,94,0.4); }
+    .profile-field-input.username-err { box-shadow: 0 0 0 2px rgba(239,68,68,0.4); }
+    .profile-field-input.username-checking { box-shadow: 0 0 0 2px rgba(245,158,11,0.4); }
+    .username-status {
+      font-size: 12px; font-weight: 500; margin-top: -4px;
+      min-height: 16px; transition: color 0.2s;
+    }
+    .username-status.ok  { color: #22c55e; }
+    .username-status.err { color: #ef4444; }
+    .username-status.checking { color: #f59e0b; }
+    /* ── Continue button (distinct from resume) ── */
+    .resume-btn.continue-btn {
+      background: linear-gradient(135deg, #1a1a2e 0%, #3a2070 100%);
+      color: #fff;
+      border-color: rgba(124,58,237,0.5);
+      box-shadow: 0 2px 14px rgba(124,58,237,0.28), 0 1px 3px rgba(0,0,0,0.10);
+    }
+    .resume-btn.continue-btn:hover { box-shadow: 0 4px 20px rgba(124,58,237,0.38); }
+    .resume-btn.continue-btn i { color: #c4b5fd; }
+    /* ── Session limit toast (5 min) ── */
+    #sessionLimitToast {
+      position: fixed;
+      bottom: 162px;
+      left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      z-index: 201;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    #sessionLimitToast.visible {
+      opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: all;
+    }
+    .sl-toast {
+      display: flex; align-items: center; gap: 11px;
+      background: linear-gradient(135deg,#1a1a2e,#3a2070);
+      color: #fff; border-radius: 18px; padding: 12px 16px 12px 14px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.22); min-width: 280px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .sl-toast-icon { font-size: 22px; flex-shrink: 0; }
+    .sl-toast-text { flex: 1; }
+    .sl-toast-title { font-size: 14px; font-weight: 700; line-height: 1.3; }
+    .sl-toast-sub   { font-size: 12px; opacity: 0.75; line-height: 1.3; margin-top: 2px; }
+    .sl-toast-close {
+      background: rgba(255,255,255,0.15); border: none; color: #fff;
+      width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+      flex-shrink: 0;
+    }
     /* ────────────────────────────────────────
        SHARED TOAST SKIN  (perplexity-style, milky pastel purple)
     ──────────────────────────────────────── */
@@ -2272,6 +2323,215 @@ body {
     .voice-play-btn.playing { border-color: #7c3aed; color: #7c3aed; background: rgba(124,58,237,0.07); }
     .voice-play-btn i { font-size: 14px; pointer-events: none; }
 
+    /* ════════════════════════════════════════
+       WEATHER CARD  (scoped under .wx-card)
+    ════════════════════════════════════════ */
+    .wx-card {
+      /* Responsive width: grows with screen, caps at 300px, never clips */
+      width: clamp(240px, 80%, 300px);
+      height: 420px;                     /* taller to stay proportional when wider */
+      border-radius: 24px;
+      overflow: hidden;
+      background-color: #fff;
+      /* Soft, natural shadow — no hard offset */
+      box-shadow: 0 8px 32px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.07);
+      /* Centre inside the flex-column transcript */
+      align-self: center;
+      flex-shrink: 0;
+      margin: 12px 0;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      /* Smooth entrance */
+      animation: msgFade 0.4s cubic-bezier(0.2,0.8,0.2,1);
+    }
+    /* Fixed-px landscape — never distorts regardless of card height */
+    .wx-landscape {
+      position: relative;
+      width: 100%;
+      height: 280px;           /* fixed, not % */
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .wx-landscape > * { position: absolute; }
+
+    /* ── Sky gradients ── */
+    .wx-card.wx-day .wx-sky {
+      width: 100%; height: 100%;
+      background: linear-gradient(0deg, rgba(247,225,87,1) 0%, rgba(233,101,148,1) 100%);
+    }
+    .wx-card.wx-night .wx-sky {
+      width: 100%; height: 100%;
+      background: linear-gradient(0deg, rgba(175,243,230,1) 0%, rgba(65,131,170,1) 100%);
+    }
+
+    /* ── Sun ── */
+    .wx-sun {
+      display: flex; align-items: center; justify-content: center;
+      width: 52px; height: 52px; border-radius: 50%;
+      background-color: #fff; bottom: 42%; left: 22%;
+      filter: drop-shadow(0 0 12px rgba(255,255,255,0.9));
+    }
+    .wx-sun::after  { position:absolute; content:''; width:118%; height:118%; border-radius:50%; background:#fff; opacity:0.5; }
+    .wx-sun::before { position:absolute; content:''; width:134%; height:134%; border-radius:50%; background:#fff; opacity:0.1; }
+
+    /* ── Moon ── */
+    .wx-moon {
+      display: flex; align-items: center; justify-content: center;
+      width: 52px; height: 52px; border-radius: 50%;
+      bottom: 42%; left: 22%; filter: drop-shadow(0 0 10px #fff);
+    }
+    .wx-moon .wx-shine-1 { width:134%; height:134%; border-radius:50%; background:#b6ebe7; opacity:0.3; }
+    .wx-moon .wx-shine-2 { display:flex; align-items:center; justify-content:center; width:118%; height:118%; border-radius:50%; background:#b6e8eb; }
+    .wx-moon .wx-moon-shape { position:absolute; width:100%; height:100%; border-radius:50%; top:-25%; right:-25%; background:#b6e8eb; }
+    .wx-moon .wx-real-moon  { position:absolute; width:100%; height:100%; border-radius:50%; background:#fff; overflow:hidden; }
+
+    /* ── Ocean ── */
+    .wx-card.wx-day .wx-ocean {
+      overflow:hidden; bottom:0; width:100%; height:28%;
+      background: linear-gradient(0deg, rgba(241,192,125,1) 0%, rgba(247,218,150,1) 100%);
+    }
+    .wx-card.wx-night .wx-ocean {
+      overflow:hidden; bottom:0; width:100%; height:28%;
+      background: linear-gradient(0deg, rgba(140,232,225,1) 0%, rgba(141,233,221,1) 100%);
+    }
+    .wx-reflection { position:absolute; background:#fff; opacity:0.5; z-index:1; }
+    .wx-reflection:nth-child(1) { width:40px; height:10px; clip-path:polygon(0% 0%,100% 0%,50% 20%); top:5%; left:32%; }
+    .wx-reflection:nth-child(2) { width:80px; height:15px; clip-path:polygon(0% 0%,100% 0%,60% 20%,40% 20%); top:15%; left:39%; }
+    .wx-reflection:nth-child(3) { width:60px; height:2px; clip-path:polygon(0% 50%,40% 0%,60% 0%,100% 50%,60% 100%,40% 100%); top:27%; right:15%; }
+    .wx-reflection:nth-child(4) { width:70px; height:2px; clip-path:polygon(0% 50%,40% 0%,60% 0%,100% 50%,60% 100%,40% 100%); top:37%; right:28%; }
+    .wx-reflection:nth-child(5) { width:70px; height:3px; clip-path:polygon(0% 50%,40% 0%,60% 0%,100% 50%,60% 100%,40% 100%); top:46%; right:8%; }
+
+    /* ── Hills (proportions relative to the card, using % where possible) ── */
+    .wx-card.wx-day  .wx-hill-1 { right:-20%; bottom:22%; width:55%; height:14%; border-radius:50%; background:#e6b29d; }
+    .wx-card.wx-day  .wx-hill-2 { right:-30%; bottom:12%; width:55%; height:28%; border-radius:50%; background:#c29182; }
+    .wx-card.wx-day  .wx-hill-3 { left:-60%;  bottom:-18%; width:130%; height:55%; border-radius:50%; background:#b77873; z-index:3; }
+    .wx-card.wx-day  .wx-hill-4 { right:-60%; bottom:-28%; width:130%; height:55%; border-radius:50%; background:#a16773; z-index:3; }
+    .wx-card.wx-day  .wx-sh1    { right:-20%; top:-20%; width:55%; height:14%; border-radius:50%; background:#f1c7a0; }
+    .wx-card.wx-day  .wx-sh2    { right:-30%; top:-48%; width:55%; height:28%; border-radius:50%; background:#e5bb96; }
+    .wx-card.wx-night .wx-hill-1 { right:-20%; bottom:22%; width:55%; height:14%; border-radius:50%; background:#4bcacc; }
+    .wx-card.wx-night .wx-hill-2 { right:-30%; bottom:12%; width:55%; height:28%; border-radius:50%; background:#3f85a8; }
+    .wx-card.wx-night .wx-hill-3 { left:-60%;  bottom:-20%; width:130%; height:55%; border-radius:50%; background:#47567f; z-index:3; }
+    .wx-card.wx-night .wx-hill-4 { right:-60%; bottom:-28%; width:130%; height:55%; border-radius:50%; background:#4a4973; z-index:3; }
+    .wx-card.wx-night .wx-sh1   { right:-20%; top:-20%; width:55%; height:14%; border-radius:50%; background:#88d8d7; }
+    .wx-card.wx-night .wx-sh2   { right:-30%; top:-48%; width:55%; height:28%; border-radius:50%; background:#73c8cf; }
+
+    /* ── Trees (% sizing so they scale with card width) ── */
+    .wx-tree-1 { bottom:22%; left:3%;  width:18%; height:26%; z-index:4; }
+    .wx-tree-2 { bottom:16%; left:25%; width:18%; height:26%; z-index:4; }
+    .wx-tree-3 { bottom:12%; right:2%; width:22%; height:30%; z-index:4; }
+    .wx-tree-1 svg, .wx-tree-2 svg, .wx-tree-3 svg { width:100%; height:100%; }
+
+    .wx-filter {
+      height:100%; width:100%; z-index:5; opacity:0.18;
+      background: linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 40%);
+    }
+
+    /* ── Info overlay (sits over the landscape) ── */
+    .wx-info {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 14px 16px 0 16px;
+      color: #fff;
+      z-index: 10;
+    }
+    /* Left: icon + condition label */
+    .wx-left {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+      max-width: 44%;
+    }
+    .wx-icon { display:flex; align-items:center; }
+    .wx-icon svg { width: 38px; height: 38px; }
+    .wx-cond {
+      font-size: 13px; font-weight: 700; line-height: 1.2;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.18);
+      word-break: break-word;
+    }
+    /* Right: pin + city + date + temp */
+    .wx-right {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
+      max-width: 54%;
+    }
+    .wx-location {
+      display: flex; align-items: center; gap: 3px;
+    }
+    .wx-location svg { width: 11px; height: auto; flex-shrink: 0; }
+    .wx-location span {
+      font-size: 10px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.04em; line-height: 1.2;
+      /* Truncate very long city names */
+      max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .wx-date { font-size: 9px; font-weight: 500; opacity: 0.88; }
+    .wx-temp { font-size: 28px; font-weight: 800; line-height: 1; margin-top: 2px; }
+
+    /* ── Forecast rows ── */
+    .wx-content {
+      flex: 1;
+      display: flex; flex-direction: column;
+      justify-content: center;
+      padding: 0 20px;
+      background: #fff;
+    }
+    .wx-forecast {
+      display: flex; flex-direction: column;
+      gap: 0; width: 100%;
+    }
+    .wx-forecast > div {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0;
+      color: #64748b; font-size: 12px; font-weight: 500;
+    }
+    .wx-forecast > div span:last-child { font-weight: 600; color: #374151; }
+    .wx-sep { width:100%; height:1px; background:#f1f5f9; }
+
+    /* Day/Night tree colours */
+    .wx-card.wx-day  .wx-tree-1 svg path,
+    .wx-card.wx-day  .wx-tree-2 svg path { fill:#b77873; stroke:#b77873; stroke-width:0; }
+    .wx-card.wx-day  .wx-tree-3 svg path  { fill:#a16773; stroke:#a16773; stroke-width:0; }
+    .wx-card.wx-night .wx-tree-1 svg path,
+    .wx-card.wx-night .wx-tree-2 svg path { fill:#3a6a8a; stroke:#3a6a8a; stroke-width:0; }
+    .wx-card.wx-night .wx-tree-3 svg path  { fill:#4a4973; stroke:#4a4973; stroke-width:0; }
+
+    /* ════════════════════════════════════════
+       MEMORY NOTIFICATION CARD
+    ════════════════════════════════════════ */
+    .mem-notif-card {
+      width: 100%;
+      background: #fff;
+      border: 1px solid #ede9f5;
+      border-radius: 16px;
+      overflow: hidden;
+      font-family: 'DM Sans', sans-serif;
+      box-shadow: 0 2px 10px rgba(124,58,237,0.06);
+      flex-shrink: 0;
+      align-self: flex-start;
+    }
+    .mem-notif-header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px 8px 14px;
+      font-size: 0.78rem; font-weight: 700;
+      color: #7c3aed; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .mem-notif-header i { font-size: 1rem; }
+    .mem-notif-text {
+      padding: 2px 14px 12px 14px;
+      font-size: 0.88rem; color: #4b5563; line-height: 1.55;
+    }
+    .mem-notif-footer {
+      border-top: 1px solid #f0ecfb;
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px; cursor: pointer;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mem-notif-footer:hover { background: #faf8ff; }
+    .mem-notif-footer i { font-size: 1.15rem; color: #7c3aed; }
+    .mem-notif-footer span { font-size: 0.88rem; font-weight: 600; color: #1a1a2e; }
+
   </style>
 </head>
 <body>
@@ -2456,6 +2716,18 @@ body {
   </div>
 
 </div><!-- /#mainScreen -->
+
+<!-- ── Session Limit Toast (7.5 min) ── -->
+<div id="sessionLimitToast">
+  <div class="sl-toast" role="alert">
+    <i class="ph-bold ph-clock sl-toast-icon"></i>
+    <div class="sl-toast-text">
+      <div class="sl-toast-title">Session limit reached (5 min)</div>
+      <div class="sl-toast-sub">Stop the session &amp; tap Continue to keep full context</div>
+    </div>
+    <button class="sl-toast-close" onclick="document.getElementById('sessionLimitToast').classList.remove('visible')" aria-label="Close">✕</button>
+  </div>
+</div>
 
 <!-- Sources Modal -->
 <div id="permissionShield">
@@ -2971,9 +3243,17 @@ body {
   // ── "Today" header injection before first transcript message ──
   window._injectTodayHeader = function() {
     if (!_firstMessage) return;
-    _firstMessage = false;
     var transcript = document.getElementById('transcriptContainer');
     if (!transcript) return;
+    // ── DOM guard: never insert if a divider already exists in the transcript.
+    //    This prevents duplicates when the user disconnects & reconnects without
+    //    clearing the conversation — the app-reset-ui event resets _firstMessage
+    //    to true but the transcript still holds the previous session's content. ──
+    if (transcript.querySelector('.chat-day-divider')) {
+      _firstMessage = false; // sync flag with reality
+      return;
+    }
+    _firstMessage = false;
     var divider = document.createElement('div');
     divider.className = 'chat-day-divider';
     divider.innerHTML =
@@ -3064,6 +3344,9 @@ body {
   const SUPABASE_URL = 'https://vvtiiffhwftiloisywdf.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2dGlpZmZod2Z0aWxvaXN5d2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDcyMTUsImV4cCI6MjA5MDg4MzIxNX0.quQYHz69lenvOJ6-v6fJXCw2x6Jj3IAUz2DQFFT6hhQ';
   window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ── Continue DB reuses the same Supabase project (no duplicate client) ──
+  window.supabaseContinue = window.supabaseClient;
 
   const $ = (id) => document.getElementById(id);
   const els = {
@@ -3223,7 +3506,29 @@ If the user asks about your technical details, Madeon, or Madesholic Research La
     this.lastUserQuery = "";
     this.accumulatedAiResponse = "";
     this.lastFrameBase64 = null; // Holds the current frame in memory
-    
+
+    // ── Smart Resume Mode Tracking ──
+    this.conversationRounds = 0;    // increments on each completed turn
+    this.hadFileUploads = false;    // true once any file is uploaded this session
+    this.hadVideoSession = false;   // true once camera is activated this session
+    this.qaContextLog = [];         // [{q, a}] — grows each turn for special context mode
+    this.specialContextFromDB = null; // Q&A text loaded from Supabase on special context resume
+    // Stable session ID for Supabase upserts — persisted across page loads
+    this.specialContextSessionId = localStorage.getItem('madeonic_sc_session_id') || ('sc_' + Date.now());
+    localStorage.setItem('madeonic_sc_session_id', this.specialContextSessionId);
+
+    // ── Continue Mode Tracking (new independent DB) ──
+    // canNativeResume: true = all conditions met (≤5min, no video, no files)
+    // If ANY condition breaks during session → set to false → use Continue button
+    this.canNativeResume = true;
+    this.sessionStartTimestamp = null;   // set on first connect
+    this.continueSessionId = localStorage.getItem('madeonic_continue_session_id') || ('cs_' + Date.now());
+    localStorage.setItem('madeonic_continue_session_id', this.continueSessionId);
+    this.continueRoundLog = [];          // [{round, q, a, ts}] stored to new DB
+    this.continueContextFromDB = null;   // full context payload loaded on Continue click
+    this._sessionLimitTimer = null;
+    this._contextSyncInterval = null;
+
     // Background Video Loop Variables
     this.bgMediaRecorder = null;
     this.bgVideoChunks =[];
@@ -3254,6 +3559,9 @@ async uploadFile(file) {
     }
 
     this._log(`Processing ${file.name}...`, "sys");
+    this.hadFileUploads = true; // Mark: this session has user file uploads → triggers special context mode
+    this.canNativeResume = false; // File upload → can't use native Gemini resume handle
+    localStorage.setItem('madeonic_continue_conditions', JSON.stringify({ canNative: false, reason: 'file' }));
     const reader = new FileReader();
 
     // 2. ROUTE: Text-based files (Code, Logs, CSV, Text)
@@ -3403,6 +3711,8 @@ async uploadFile(file) {
     if (persona.name === "Madesh") return; // EXCLUSION
     const userName = persona.name || persona.fullname || "Anonymous";
     const sessionId = this.resumeHandle || "session_" + Date.now();
+
+    // ── Always save to conversations table (existing) ──
     try {
       const { error } = await window.supabaseClient.from('conversations').insert([{
         session_id: sessionId, user_name: userName, query: query || "", answer: answer || ""
@@ -3410,6 +3720,87 @@ async uploadFile(file) {
       if (error) console.log("Supabase DB Error:", error.message);
       else console.log("Conversation saved to DB.");
     } catch(err) { console.log("DB Save failed:", err); }
+
+    // ── Special Context Mode: accumulate Q&A log and upsert snapshot ──
+    if (query) {
+      this.qaContextLog.push({ q: query, a: answer || "" });
+    }
+    if (this._isSpecialContextMode()) {
+      this._updateSpecialContextSnapshot(userName);
+    }
+
+    // ── NEW: Save each round to continue DB + update local log ──
+    if (query) {
+      this.continueRoundLog.push({ round: this.conversationRounds, q: query, a: answer || "", ts: new Date().toISOString() });
+      this._saveContinueRound(query, answer || "");
+      this._persistContextToLocalStorage();
+    }
+  }
+
+  // Persist full context snapshot to localStorage every second (called by interval + on round)
+  _persistContextToLocalStorage() {
+    try {
+      const snapshot = {
+        session_id:  this.continueSessionId,
+        username:    localStorage.getItem('madeonic_username') || 'anonymous',
+        rounds:      this.continueRoundLog,
+        canNative:   this.canNativeResume,
+        hadFiles:    this.hadFileUploads,
+        hadVideo:    this.hadVideoSession,
+        startTs:     this.sessionStartTimestamp,
+        updatedAt:   Date.now()
+      };
+      localStorage.setItem('madeonic_continue_context', JSON.stringify(snapshot));
+    } catch(e) {}
+  }
+
+  // Save a single Q&A round to the new Supabase DB
+  async _saveContinueRound(query, answer) {
+    if (!window.supabaseContinue) return;
+    const username = localStorage.getItem('madeonic_username') || 'anonymous';
+    try {
+      await window.supabaseContinue.from('chat_rounds').insert([{
+        username:     username,
+        session_id:   this.continueSessionId,
+        round_number: this.conversationRounds,
+        user_message: query,
+        ai_response:  answer,
+        created_at:   new Date().toISOString()
+      }]);
+    } catch(e) { console.log('Continue round save error:', e); }
+  }
+
+  // Returns true when the session is too complex for native resume
+  _isSpecialContextMode() {
+    return this.hadFileUploads || this.hadVideoSession || this.conversationRounds >= 50;
+  }
+
+  // Builds Q&A text and upserts it to session_snapshots in Supabase
+  async _updateSpecialContextSnapshot(userName) {
+    if (this.qaContextLog.length === 0) return;
+    const persona = JSON.parse(localStorage.getItem('user_persona') || "{}");
+    if ((persona.name || persona.fullname) === "Madesh") return;
+
+    const qaText = this.qaContextLog.map((entry, i) =>
+      `[Round ${i + 1}]\nUser: ${entry.q}\nAssistant: ${entry.a}`
+    ).join('\n\n');
+
+    const sessionId = this.specialContextSessionId;
+    const resolvedUserName = userName || persona.name || persona.fullname || "Anonymous";
+
+    try {
+      const { error } = await window.supabaseClient.from('session_snapshots').upsert([{
+        session_id: sessionId,
+        user_name: resolvedUserName,
+        qa_context: qaText,
+        round_count: this.conversationRounds,
+        had_files: this.hadFileUploads,
+        had_video: this.hadVideoSession,
+        updated_at: new Date().toISOString()
+      }], { onConflict: 'session_id' });
+      if (error) console.log("Snapshot upsert error:", error.message);
+      else console.log("Special context snapshot saved.");
+    } catch(err) { console.log("Snapshot save failed:", err); }
   }
 
   _startBackgroundVideoRecorder() {
@@ -3937,6 +4328,30 @@ async _parsePdf(file) {
         this._sendSetup();
         // Notify UI glue: WS is truly open → auto-start mic
         window.dispatchEvent(new CustomEvent('app-ws-connected'));
+
+        // ── Session start timestamp (for 5-min native-resume gate & 7.5-min limit) ──
+        if (!this.sessionStartTimestamp) {
+          this.sessionStartTimestamp = Date.now();
+        }
+
+        // ── 5-minute session limit: fires toast + kills native resume eligibility ──
+        clearTimeout(this._sessionLimitTimer);
+        this._sessionLimitTimer = setTimeout(() => {
+          this.canNativeResume = false;
+          localStorage.setItem('madeonic_continue_conditions', JSON.stringify({ canNative: false, reason: 'time_limit' }));
+          var toast = document.getElementById('sessionLimitToast');
+          if (toast) {
+            toast.classList.add('visible');
+            setTimeout(() => toast.classList.remove('visible'), 12000);
+          }
+          this._log("Session limit reached (5 min). Continue mode active.", "sys");
+        }, 5 * 60 * 1000);
+
+        // ── Context sync to localStorage every second ──
+        clearInterval(this._contextSyncInterval);
+        this._contextSyncInterval = setInterval(() => {
+          this._persistContextToLocalStorage();
+        }, 1000);
       };
 
       this.ws.onmessage = async (event) => {
@@ -4053,6 +4468,11 @@ async _parsePdf(file) {
             name: "delete_memory",
             description: "Deletes a specific fact from memory.",
             parameters: { type: "object", properties: { memory: { type: "string" } }, required: ["memory"] }
+          },
+          {
+            name: "show_weather",
+            description: "Fetches real-time weather for the user's current location via Open-Meteo and renders a beautiful weather card showing current temperature, condition, humidity, wind, and a 3-day forecast. Call this whenever the user asks about weather, temperature, rain, forecast, or climate.",
+            parameters: { type: "object", properties: { location_hint: { type: "string", description: "Optional city/area name hint if already known" } } }
           }
         ]
       }];
@@ -4091,6 +4511,34 @@ async _parsePdf(file) {
       if (context) {
         context += "\n---";
         setup.systemInstruction.parts[0].text += context;
+      }
+
+      // ── Special Context Resume Injection ──
+      if (this.specialContextFromDB) {
+        setup.systemInstruction.parts[0].text +=
+          "\n\n---\n## Previous Session Context (Hidden Continuity File)\n" +
+          "The user is resuming a previous session. Below is the complete question-and-answer " +
+          "log from that session. Use it silently to maintain context, memory, and conversational " +
+          "continuity. Do not announce or reference this file explicitly unless asked.\n\n" +
+          this.specialContextFromDB +
+          "\n---";
+        this._log("Special context injected into system prompt.", "ok");
+        this.specialContextFromDB = null;
+      }
+
+      // ── Continue Context Injection (new DB-backed session continuity) ──
+      if (this.continueContextFromDB) {
+        setup.systemInstruction.parts[0].text +=
+          "\n\n---\n## CONTINUE: User's Last Stopped Session\n" +
+          "This is the user's last stopped session context — note this carefully. " +
+          "The user cut off mid-session and is now continuing. " +
+          "Treat all prior context as if you lived it. " +
+          "When the user begins, acknowledge warmly that you remember where you left off, " +
+          "then continue naturally without re-explaining everything.\n\n" +
+          this.continueContextFromDB +
+          "\n---";
+        this._log("Continue context injected into system prompt.", "ok");
+        this.continueContextFromDB = null;
       }
 
       this._send({ setup });
@@ -4189,17 +4637,32 @@ async _parsePdf(file) {
             this._renderMap(call.args);
             this._send({ toolResponse: { functionResponses: [{ name: "places_map_display_v0", id: call.id, response: { output: { success: true } } }] } });
           }
+          if (call.name === "show_weather") {
+            this._log("Fetching real-time weather...", "sys");
+            this._updatePillState('searching');
+            try {
+              const weatherData = await this._callShowWeather(call.args);
+              this._renderWeatherCard(weatherData);
+              this._send({ toolResponse: { functionResponses: [{ name: "show_weather", id: call.id, response: { output: weatherData.summary } }] } });
+            } catch (err) {
+              this._log("Weather fetch failed: " + err.message, "err");
+              this._send({ toolResponse: { functionResponses: [{ name: "show_weather", id: call.id, response: { output: { error: err.message } } }] } });
+            }
+          }
           if (call.name.includes("memory")) this._playChime('tool');
           if (call.name === "save_memory") {
             this._saveToLocalStorage(call.args.memory);
+            this._renderMemoryCard('saved', call.args.memory);
             this._send({ toolResponse: { functionResponses: [{ name: "save_memory", id: call.id, response: { output: { status: "Saved." } } }] } });
           }
           if (call.name === "edit_memory") {
             this._editLocalStorage(call.args.old_memory, call.args.new_memory);
+            this._renderMemoryCard('updated', call.args.new_memory);
             this._send({ toolResponse: { functionResponses: [{ name: "edit_memory", id: call.id, response: { output: { status: "Updated." } } }] } });
           }
           if (call.name === "delete_memory") {
             this._deleteFromLocalStorage(call.args.memory);
+            this._renderMemoryCard('deleted', call.args.memory);
             this._send({ toolResponse: { functionResponses: [{ name: "delete_memory", id: call.id, response: { output: { status: "Deleted." } } }] } });
           }
         }
@@ -4212,8 +4675,14 @@ async _parsePdf(file) {
         const handle = u.handle || u.token || u.newHandle;
         if (handle) {
           this.resumeHandle = handle;
-          // Persist so user can continue if they close and reopen
-          localStorage.setItem('madeonic_session_handle', handle);
+          // ── Smart Resume Gate ──
+          // Only persist native handle for simple sessions (no files, no video, ≤50 rounds).
+          // Complex sessions use Supabase special context mode instead.
+          if (!this._isSpecialContextMode()) {
+            localStorage.setItem('madeonic_session_handle', handle);
+          } else {
+            localStorage.removeItem('madeonic_session_handle'); // Clear; special context takes over
+          }
           this._syncUI();
           this._log("Resumption handle updated & saved.", "ok");
         }
@@ -4295,6 +4764,7 @@ if (sc.turnComplete) {
 
           // 2. Save Background DB Conversation
           this._saveConversation(this.lastUserQuery, this.accumulatedAiResponse.trim());
+          this.conversationRounds++; // Track rounds for smart resume gating
           this.lastUserQuery = "";
           this.accumulatedAiResponse = "";
         }
@@ -4624,6 +5094,210 @@ _renderMap(args) {
     _appendCarousel(wrapper) {
       els.transcript.appendChild(wrapper);
       els.transcript.scrollTop = els.transcript.scrollHeight;
+    }
+
+    // ── Weather Tool ──────────────────────────────────────────────────────────
+
+    _getWeatherInfo(code, isDay) {
+      const map = {
+        0:  { label: 'Clear sky',         icon: isDay ? 'sun' : 'moon-stars' },
+        1:  { label: 'Mainly clear',      icon: isDay ? 'sun' : 'moon-stars' },
+        2:  { label: 'Partly cloudy',     icon: 'cloud-sun' },
+        3:  { label: 'Overcast',          icon: 'cloud' },
+        45: { label: 'Foggy',             icon: 'cloud-fog' },
+        48: { label: 'Icy fog',           icon: 'cloud-fog' },
+        51: { label: 'Light drizzle',     icon: 'cloud-rain' },
+        53: { label: 'Drizzle',           icon: 'cloud-rain' },
+        55: { label: 'Heavy drizzle',     icon: 'cloud-rain' },
+        61: { label: 'Light rain',        icon: 'cloud-rain' },
+        63: { label: 'Rain',              icon: 'cloud-rain' },
+        65: { label: 'Heavy rain',        icon: 'cloud-rain-wind' },
+        71: { label: 'Light snow',        icon: 'snowflake' },
+        73: { label: 'Snow',              icon: 'snowflake' },
+        75: { label: 'Heavy snow',        icon: 'snowflake' },
+        80: { label: 'Rain showers',      icon: 'cloud-rain' },
+        81: { label: 'Rain showers',      icon: 'cloud-rain' },
+        82: { label: 'Heavy showers',     icon: 'cloud-rain-wind' },
+        85: { label: 'Snow showers',      icon: 'snowflake' },
+        86: { label: 'Heavy snow shower', icon: 'snowflake' },
+        95: { label: 'Thunderstorm',      icon: 'lightning' },
+        96: { label: 'Thunderstorm',      icon: 'lightning' },
+        99: { label: 'Thunderstorm',      icon: 'lightning' },
+      };
+      return map[code] || { label: 'Unknown', icon: 'cloud' };
+    }
+
+    async _callShowWeather(args) {
+      // 1. Get location
+      const geoOptions = { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 };
+      const pos = await new Promise((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(resolve, reject, geoOptions)
+      );
+      const { latitude, longitude, accuracy } = pos.coords;
+      this._log(`GPS: ±${accuracy.toFixed(0)}m`, "ok");
+
+      // 2. Reverse geocode city name
+      let cityName = args?.location_hint || 'Your location';
+      try {
+        const geo = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&zoom=10`
+        ).then(r => r.json());
+        cityName = geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || cityName;
+      } catch {}
+
+      // 3. Fetch Open-Meteo — current + 4-day daily
+      const meteoUrl =
+        `https://api.open-meteo.com/v1/forecast` +
+        `?latitude=${latitude}&longitude=${longitude}` +
+        `&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,is_day` +
+        `&daily=temperature_2m_max,temperature_2m_min,weather_code` +
+        `&timezone=auto&forecast_days=4`;
+      const meteo = await fetch(meteoUrl).then(r => r.json());
+
+      const c   = meteo.current;
+      const d   = meteo.daily;
+      const isDay = c.is_day === 1;
+      const info  = this._getWeatherInfo(c.weather_code, isDay);
+
+      // 4. Build structured summary to send back to model
+      const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const now = new Date();
+      const todayLabel = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]}`;
+
+      const forecast = d.time.slice(1, 4).map((dateStr, i) => {
+        const dt  = new Date(dateStr + 'T00:00:00');
+        const inf = this._getWeatherInfo(d.weather_code[i + 1], true);
+        return {
+          label: `${days[dt.getDay()]}, ${dt.getDate()} ${months[dt.getMonth()]}`,
+          max: Math.round(d.temperature_2m_max[i + 1]),
+          min: Math.round(d.temperature_2m_min[i + 1]),
+          condition: inf.label
+        };
+      });
+
+      return {
+        city: cityName,
+        lat: latitude, lon: longitude,
+        temp: Math.round(c.temperature_2m),
+        feels: Math.round(c.apparent_temperature),
+        humidity: c.relative_humidity_2m,
+        wind: Math.round(c.wind_speed_10m),
+        condition: info.label,
+        icon: info.icon,
+        isDay,
+        todayLabel,
+        forecast,
+        summary: {
+          city: cityName,
+          temperature: `${Math.round(c.temperature_2m)}°C`,
+          feels_like: `${Math.round(c.apparent_temperature)}°C`,
+          condition: info.label,
+          humidity: `${c.relative_humidity_2m}%`,
+          wind: `${Math.round(c.wind_speed_10m)} km/h`,
+          forecast: forecast.map(f => `${f.label}: ${f.max}°/${f.min}° ${f.condition}`).join(', ')
+        }
+      };
+    }
+
+    _renderWeatherCard(data) {
+      const theme = data.isDay ? 'wx-day' : 'wx-night';
+      const treeSvgPath = `<path d="M32,0C18.148,0,12,23.188,12,32c0,9.656,6.883,17.734,16,19.594V60c0,2.211,1.789,4,4,4s4-1.789,4-4v-8.406C45.117,49.734,52,41.656,52,32C52,22.891,46.051,0,32,0z"/>`;
+
+      const celestialHtml = data.isDay
+        ? `<div class="wx-sun"></div>`
+        : `<div class="wx-moon">
+             <div class="wx-shine-1"></div>
+             <div class="wx-shine-2">
+               <div class="wx-moon-shape"></div>
+               <div class="wx-real-moon"></div>
+             </div>
+           </div>`;
+
+      // Weather icon SVG (phosphor inline SVG for the condition icon)
+      const conditionSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="40" height="40"><path stroke="rgba(255,255,255,0.9)" d="M22 14.3529C22 17.4717 19.4416 20 16.2857 20H11M14.381 9.02721C14.9767 8.81911 15.6178 8.70588 16.2857 8.70588C16.9404 8.70588 17.5693 8.81468 18.1551 9.01498M7.11616 11.6089C6.8475 11.5567 6.56983 11.5294 6.28571 11.5294C3.91878 11.5294 2 13.4256 2 15.7647C2 18.1038 3.91878 20 6.28571 20H7M7.11616 11.6089C6.88706 10.9978 6.7619 10.3369 6.7619 9.64706C6.7619 6.52827 9.32028 4 12.4762 4C15.4159 4 17.8371 6.19371 18.1551 9.01498M7.11616 11.6089C7.68059 11.7184 8.20528 11.9374 8.66667 12.2426M18.1551 9.01498C18.8381 9.24853 19.4623 9.60648 20 10.0614" stroke-width="1.5"/></svg>`;
+
+      const pinSvg = `<svg width="14px" height="14px" viewBox="0 0 64 64" fill="#fff" stroke="#fff"><path fill="#fff" d="M32,0C18.746,0,8,10.746,8,24c0,5.219,1.711,10.008,4.555,13.93c0.051,0.094,0.059,0.199,0.117,0.289l16,24C29.414,63.332,30.664,64,32,64s2.586-0.668,3.328-1.781l16-24c0.059-0.09,0.066-0.195,0.117-0.289C54.289,34.008,56,29.219,56,24C56,10.746,45.254,0,32,0z M32,32c-4.418,0-8-3.582-8-8s3.582-8,8-8s8,3.582,8,8S36.418,32,32,32z"/></svg>`;
+
+      const treeSvg = `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">${treeSvgPath}</svg>`;
+
+      const forecastHtml = data.forecast.map((f, i) => `
+        ${i > 0 ? '<div class="wx-sep"></div>' : ''}
+        <div><span>${f.label}</span><span>${f.max}° / ${f.min}°</span></div>
+      `).join('');
+
+      const card = document.createElement('div');
+      card.className = `wx-card ${theme}`;
+      card.innerHTML = `
+        <section class="wx-landscape">
+          <div class="wx-sky"></div>
+          ${celestialHtml}
+          <div class="wx-hill-1"></div>
+          <div class="wx-hill-2"></div>
+          <div class="wx-ocean">
+            <div class="wx-reflection"></div><div class="wx-reflection"></div>
+            <div class="wx-reflection"></div><div class="wx-reflection"></div>
+            <div class="wx-reflection"></div>
+            <div class="wx-sh1"></div><div class="wx-sh2"></div>
+          </div>
+          <div class="wx-hill-3"></div>
+          <div class="wx-hill-4"></div>
+          <div class="wx-tree-1">${treeSvg}</div>
+          <div class="wx-tree-2">${treeSvg}</div>
+          <div class="wx-tree-3">${treeSvg}</div>
+          <div class="wx-filter"></div>
+          <div class="wx-info">
+            <div class="wx-left">
+              <div class="wx-icon">${conditionSvg}</div>
+              <div class="wx-cond">${data.condition}</div>
+            </div>
+            <div class="wx-right">
+              <div class="wx-location">
+                ${pinSvg}<span>${data.city}</span>
+              </div>
+              <div class="wx-date">${data.todayLabel}</div>
+              <div class="wx-temp">${data.temp}°C</div>
+            </div>
+          </div>
+        </section>
+        <div class="wx-content">
+          <div class="wx-forecast">${forecastHtml}</div>
+        </div>
+      `;
+      els.transcript.appendChild(card);
+      requestAnimationFrame(() => { els.transcript.scrollTop = els.transcript.scrollHeight; });
+      this._log(`Weather card rendered for ${data.city} — ${data.temp}°C, ${data.condition}.`, "ok");
+    }
+
+    // ── Memory Notification Card ──────────────────────────────────────────────
+
+    _renderMemoryCard(type, text) {
+      const labels = {
+        saved:   { title: 'Saved memory',         icon: 'ph-bold ph-brain' },
+        updated: { title: 'Updated saved memory',  icon: 'ph-bold ph-pencil-simple' },
+        deleted: { title: 'Removed from memory',   icon: 'ph-bold ph-trash' },
+      };
+      const { title, icon } = labels[type] || labels.saved;
+
+      const card = document.createElement('div');
+      card.className = 'mem-notif-card msg';
+      card.innerHTML = `
+        <div class="mem-notif-header">
+          <i class="${icon}"></i>
+          <span>${title}</span>
+        </div>
+        <div class="mem-notif-text">${text}</div>
+        <div class="mem-notif-footer" onclick="
+          document.getElementById('settingsPanel').classList.add('open');
+          document.body.classList.add('settings-open');
+          setTimeout(function(){ document.getElementById('memoryList').scrollIntoView({behavior:'smooth',block:'start'}); }, 350);
+        ">
+          <i class="ph-bold ph-database"></i>
+          <span>Manage memories</span>
+        </div>
+      `;
+      els.transcript.appendChild(card);
+      requestAnimationFrame(() => { els.transcript.scrollTop = els.transcript.scrollHeight; });
     }
 
     _saveToLocalStorage(text) {
@@ -5031,6 +5705,9 @@ _appendTranscript(role, text, isStreaming = false) {
         els.cameraPreview.srcObject = this.camStream;
         await els.cameraPreview.play().catch(() => {});
         this.camActive = true;
+        this.hadVideoSession = true; // Mark: this session had a live video session → triggers special context mode
+        this.canNativeResume = false; // Video → can't use native Gemini resume handle
+        localStorage.setItem('madeonic_continue_conditions', JSON.stringify({ canNative: false, reason: 'video' }));
         container.classList.add('pip-on');
         
         this.videoLoopVersion += 1;
@@ -5363,12 +6040,38 @@ async _sendCurrentFrame() {
       this.manualClose = true;
       clearTimeout(this.retryTimer);
       clearTimeout(this.videoTimer);
+      clearTimeout(this._sessionLimitTimer);
+      clearInterval(this._contextSyncInterval);
       this.player.clear();
 
-      // Persist session handle before disconnecting so user can resume
+      // ── Final context persist before disconnect ──
+      this._persistContextToLocalStorage();
+
+      // ── Check elapsed time for 5-min native resume gate ──
+      if (this.sessionStartTimestamp) {
+        var elapsed = Date.now() - this.sessionStartTimestamp;
+        if (elapsed > 5 * 60 * 1000) {
+          this.canNativeResume = false;
+        }
+      }
+
+      // ── Save continue mode decision ──
+      localStorage.setItem('madeonic_continue_conditions', JSON.stringify({
+        canNative: this.canNativeResume,
+        hadFiles:  this.hadFileUploads,
+        hadVideo:  this.hadVideoSession,
+        sessionId: this.continueSessionId
+      }));
+
+      // Persist session handle before disconnecting — only for simple sessions
       if (this.resumeHandle) {
-        localStorage.setItem('madeonic_session_handle', this.resumeHandle);
-        this._log("Session handle saved for resume.", "sys");
+        if (!this._isSpecialContextMode()) {
+          localStorage.setItem('madeonic_session_handle', this.resumeHandle);
+          this._log("Session handle saved for native resume.", "sys");
+        } else {
+          localStorage.removeItem('madeonic_session_handle');
+          this._log("Special context mode — native handle not persisted.", "sys");
+        }
       }
       
       // Force hardware stop
@@ -5402,17 +6105,32 @@ async _sendCurrentFrame() {
 
     async clearConversation() {
       this._log("Clearing conversation…", "sys");
-      // Disconnect fully, kill handle so new session starts fresh
       this.resumeHandle = "";
       localStorage.removeItem('madeonic_session_handle');
+      // Reset smart resume state
+      this.conversationRounds = 0;
+      this.hadFileUploads = false;
+      this.hadVideoSession = false;
+      this.qaContextLog = [];
+      this.specialContextFromDB = null;
+      this.specialContextSessionId = 'sc_' + Date.now();
+      localStorage.setItem('madeonic_sc_session_id', this.specialContextSessionId);
+      // Reset continue-mode state
+      this.canNativeResume = true;
+      this.sessionStartTimestamp = null;
+      this.continueRoundLog = [];
+      this.continueContextFromDB = null;
+      this.continueSessionId = 'cs_' + Date.now();
+      localStorage.setItem('madeonic_continue_session_id', this.continueSessionId);
+      localStorage.removeItem('madeonic_continue_conditions');
+      localStorage.removeItem('madeonic_continue_context');
+      clearTimeout(this._sessionLimitTimer);
+      clearInterval(this._contextSyncInterval);
       await this.disconnect();
-      // Clear transcript UI
       els.transcript.innerHTML = "";
       document.body.classList.remove('chat-active');
       this._log("Conversation cleared.", "ok");
-      // Close settings panel
       document.getElementById('settingsPanel').classList.remove('open');
-      // Reconnect after short pause
       setTimeout(() => this.connect(), 500);
     }
   }
@@ -5502,47 +6220,190 @@ async _sendCurrentFrame() {
     };
   })();
   (function initSessionResumeButtons() {
-    var savedHandle = localStorage.getItem('madeonic_session_handle');
-    var resumeBlock = document.getElementById('sessionResumeBlock');
-    var resumeBtn   = document.getElementById('resumeSessionBtn');
-    var newBtn      = document.getElementById('newSessionBtn');
+    var savedHandle     = localStorage.getItem('madeonic_session_handle');
+    var savedScId       = localStorage.getItem('madeonic_sc_session_id');
+    var savedConditions = JSON.parse(localStorage.getItem('madeonic_continue_conditions') || '{}');
+    var savedContinueCtx= localStorage.getItem('madeonic_continue_context');
+    var resumeBlock     = document.getElementById('sessionResumeBlock');
+    var resumeBtn       = document.getElementById('resumeSessionBtn');
+    var newBtn          = document.getElementById('newSessionBtn');
 
-    if (savedHandle && resumeBlock) {
-      // Show the resume buttons and flag body
-      resumeBlock.classList.add('visible');
-      document.body.classList.add('has-resume');
+    function startNew() {
+      localStorage.removeItem('madeonic_session_handle');
+      localStorage.removeItem('madeonic_continue_conditions');
+      localStorage.removeItem('madeonic_continue_context');
+      if (window.app) {
+        window.app.resumeHandle = "";
+        window.app.conversationRounds = 0;
+        window.app.hadFileUploads = false;
+        window.app.hadVideoSession = false;
+        window.app.qaContextLog = [];
+        window.app.specialContextFromDB = null;
+        window.app.continueRoundLog = [];
+        window.app.continueContextFromDB = null;
+        window.app.canNativeResume = true;
+        window.app.sessionStartTimestamp = null;
+        var newScId = 'sc_' + Date.now();
+        var newCsId = 'cs_' + Date.now();
+        window.app.specialContextSessionId = newScId;
+        window.app.continueSessionId = newCsId;
+        localStorage.setItem('madeonic_sc_session_id', newScId);
+        localStorage.setItem('madeonic_continue_session_id', newCsId);
+        window.app._syncUI();
+        window.app._log("Starting fresh session…", "sys");
+      }
+      if (resumeBlock) resumeBlock.classList.remove('visible');
+      document.body.classList.remove('has-resume');
+      document.getElementById('uiConnectBtn').click();
     }
 
-    if (resumeBtn) {
-      resumeBtn.addEventListener('click', function() {
-        var handle = localStorage.getItem('madeonic_session_handle');
-        if (handle && window.app) {
-          window.app.resumeHandle = handle;
-          window.app._syncUI();
-          window.app._log("Resuming previous session…", "sys");
-        }
-        resumeBlock.classList.remove('visible');
-        document.body.classList.remove('has-resume');
-        document.getElementById('uiConnectBtn').click();
-      });
-    }
-
-    if (newBtn) {
-      newBtn.addEventListener('click', function() {
-        // Clear old handle — start fresh
-        localStorage.removeItem('madeonic_session_handle');
+    // ── Check existing Supabase special-context snapshot (original DB) ──
+    async function checkSpecialContextSnapshot() {
+      if (!savedScId || !window.supabaseClient) return false;
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('session_snapshots')
+          .select('qa_context, round_count, had_files, had_video')
+          .eq('session_id', savedScId)
+          .single();
+        if (error || !data || !data.qa_context) return false;
         if (window.app) {
-          window.app.resumeHandle = "";
-          window.app._syncUI();
-          window.app._log("Starting new session…", "sys");
+          window.app.specialContextFromDB = data.qa_context;
+          window.app.conversationRounds   = data.round_count  || 0;
+          window.app.hadFileUploads        = data.had_files    || false;
+          window.app.hadVideoSession       = data.had_video    || false;
         }
-        resumeBlock.classList.remove('visible');
-        document.body.classList.remove('has-resume');
-        document.getElementById('uiConnectBtn').click();
-      });
+        return true;
+      } catch(e) { return false; }
     }
 
-    // Hide resume block once connected
+    // ── Load full session rounds from new Supabase for Continue ──
+    async function loadContinueContextFromDB(sessionId, username) {
+      if (!window.supabaseContinue || !sessionId) return null;
+      try {
+        const { data, error } = await window.supabaseContinue
+          .from('chat_rounds')
+          .select('round_number, user_message, ai_response, created_at')
+          .eq('session_id', sessionId)
+          .order('round_number', { ascending: true });
+        if (error || !data || !data.length) return null;
+        return data;
+      } catch(e) { return null; }
+    }
+
+    // ── Build the continue payload string from DB rows + localStorage context ──
+    function buildContinuePayload(dbRows, localCtx) {
+      var lines = [];
+      lines.push("=== PREVIOUS SESSION CONTEXT ===");
+      if (localCtx && localCtx.startTs) {
+        var startDate = new Date(localCtx.startTs);
+        lines.push("Session started: " + startDate.toLocaleString());
+      }
+      lines.push("");
+      if (dbRows && dbRows.length) {
+        dbRows.forEach(function(row) {
+          lines.push("[Round " + row.round_number + "]");
+          lines.push("User: " + (row.user_message || ""));
+          lines.push("Assistant: " + (row.ai_response || ""));
+          lines.push("");
+        });
+      } else if (localCtx && localCtx.rounds && localCtx.rounds.length) {
+        // Fallback to localStorage rounds
+        localCtx.rounds.forEach(function(r) {
+          lines.push("[Round " + r.round + "]");
+          lines.push("User: " + (r.q || ""));
+          lines.push("Assistant: " + (r.a || ""));
+          lines.push("");
+        });
+      }
+      lines.push("=== END OF PREVIOUS SESSION ===");
+      return lines.join("\n");
+    }
+
+    // ── Main decision logic ──
+    async function decideResumeMode() {
+      // Case 1: Check if there's ANY previous context at all
+      var hasPreviousSession = savedHandle || savedContinueCtx || savedConditions.sessionId;
+      if (!hasPreviousSession) return; // Nothing to resume/continue
+
+      var canNative = savedConditions.canNative !== false; // default true if not set
+
+      // Additional check: if special context snapshot exists in old DB, override to continue
+      var hasSpecialContext = await checkSpecialContextSnapshot();
+      if (hasSpecialContext) canNative = false;
+
+      // Show the resume block
+      if (resumeBlock) resumeBlock.classList.add('visible');
+      document.body.classList.add('has-resume');
+
+      if (canNative && savedHandle) {
+        // ── RESUME PATH: simple session, use native Gemini handle ──
+        resumeBtn.innerHTML = '<i class="ph-bold ph-arrow-counter-clockwise"></i>Resume session';
+        resumeBtn.className = 'resume-btn primary';
+        window.app && window.app._log("Native resume handle available.", "ok");
+
+        resumeBtn.onclick = function() {
+          if (window.app) {
+            window.app.resumeHandle = savedHandle;
+            window.app._syncUI();
+            window.app._log("Resuming via native Gemini handle…", "sys");
+          }
+          resumeBlock.classList.remove('visible');
+          document.body.classList.remove('has-resume');
+          document.getElementById('uiConnectBtn').click();
+        };
+
+      } else {
+        // ── CONTINUE PATH: complex/long/video/file session ──
+        resumeBtn.innerHTML = '<i class="ph-bold ph-arrow-bend-up-left"></i>Continue last session';
+        resumeBtn.className = 'resume-btn primary continue-btn';
+        window.app && window.app._log("Continue mode: loading context from DB + localStorage…", "sys");
+
+        resumeBtn.onclick = async function() {
+          resumeBtn.innerHTML = '<i class="ph-bold ph-spinner"></i>Loading context…';
+          resumeBtn.disabled = true;
+
+          var localCtx = null;
+          try { localCtx = JSON.parse(savedContinueCtx || 'null'); } catch(e) {}
+
+          var sessionId = (savedConditions.sessionId) || (localCtx && localCtx.session_id) || null;
+          var username  = localStorage.getItem('madeonic_username') || 'anonymous';
+
+          // Fetch full DB rows
+          var dbRows = await loadContinueContextFromDB(sessionId, username);
+
+          // Build combined context payload
+          var payload = buildContinuePayload(dbRows, localCtx);
+
+          // Inject into app for _sendSetup to pick up
+          if (window.app) {
+            window.app.continueContextFromDB = payload;
+            window.app._log("Continue context loaded (" + (dbRows ? dbRows.length : 0) + " rounds from DB).", "ok");
+            // Fresh continue session IDs
+            var newCsId = 'cs_' + Date.now();
+            window.app.continueSessionId = newCsId;
+            localStorage.setItem('madeonic_continue_session_id', newCsId);
+            window.app.continueRoundLog = [];
+            window.app.canNativeResume = true; // fresh session starts eligible
+            window.app.sessionStartTimestamp = null;
+          }
+
+          // Clear old condition flags
+          localStorage.removeItem('madeonic_session_handle');
+          localStorage.removeItem('madeonic_continue_conditions');
+          localStorage.removeItem('madeonic_continue_context');
+
+          resumeBlock.classList.remove('visible');
+          document.body.classList.remove('has-resume');
+          document.getElementById('uiConnectBtn').click();
+        };
+      }
+    }
+
+    decideResumeMode();
+
+    if (newBtn) newBtn.addEventListener('click', startNew);
+
     window.addEventListener('app-ws-connected', function() {
       if (resumeBlock) resumeBlock.classList.remove('visible');
       document.body.classList.remove('has-resume');
@@ -5743,6 +6604,34 @@ async _sendCurrentFrame() {
             <span class="wv-feature-desc">Your session is private. Disconnect anytime from the toolbar.</span>
           </div>
         </div>
+
+        <!-- ── New: Upgraded Memory Persistence ── -->
+        <div class="wv-feature" style="position:relative;">
+          <div class="wv-icon-wrap">
+            <img src="https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773578/opxh4rurzufpnmtn6yuz.png" alt="Memory"/>
+          </div>
+          <div class="wv-feature-text">
+            <span class="wv-feature-title" style="display:flex;align-items:center;gap:6px;">
+              Upgraded memory
+              <span style="font-size:9px;font-weight:800;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;padding:2px 7px;border-radius:100px;letter-spacing:0.04em;text-transform:uppercase;">NEW</span>
+            </span>
+            <span class="wv-feature-desc">Remembers facts, preferences, and life details across every session — automatically.</span>
+          </div>
+        </div>
+
+        <!-- ── New: Session Continuity (Continue) ── -->
+        <div class="wv-feature">
+          <div class="wv-icon-wrap" style="background:linear-gradient(135deg,#1a1a2e,#3a2070);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <i class="ph-bold ph-arrow-bend-up-left" style="font-size:18px;color:#c4b5fd;"></i>
+          </div>
+          <div class="wv-feature-text">
+            <span class="wv-feature-title" style="display:flex;align-items:center;gap:6px;">
+              Session continuity
+              <span style="font-size:9px;font-weight:800;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;padding:2px 7px;border-radius:100px;letter-spacing:0.04em;text-transform:uppercase;">NEW</span>
+            </span>
+            <span class="wv-feature-desc">Cut off mid-chat? Hit Continue — full context is restored from the cloud, right where you left off.</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -5758,8 +6647,13 @@ async _sendCurrentFrame() {
     var overlay = document.getElementById('welcomeOverlay');
     var btn     = document.getElementById('welcomeContinueBtn');
 
-    // ── Always show on page open (no localStorage gate) ──
-    overlay.style.display = 'flex';
+    // ── Only show for brand-new users (no profile saved yet) ──
+    var isNewUser = !localStorage.getItem('madeonic_profile_done');
+    if (!isNewUser) {
+      overlay.style.display = 'none';
+    } else {
+      overlay.style.display = 'flex';
+    }
 
     var counting = false;
 
@@ -5817,12 +6711,17 @@ async _sendCurrentFrame() {
     <!-- ── Name Fields ── -->
     <div class="profile-section-profile">
       <div class="profile-field-group">
-        <label class="profile-field-label" for="pro-fullname">Full name</label>
+        <label class="profile-field-label" for="pro-fullname">Full name <span style="color:#ef4444">*</span></label>
         <input class="profile-field-input" type="text" id="pro-fullname" placeholder="Your full name" autocomplete="off" />
       </div>
       <div class="profile-field-group">
         <label class="profile-field-label" for="pro-callname">What should we call you?</label>
         <input class="profile-field-input" type="text" id="pro-callname" placeholder="Nickname or first name" autocomplete="off" />
+      </div>
+      <div class="profile-field-group">
+        <label class="profile-field-label" for="pro-username">Username <span style="color:#ef4444">*</span> <span style="font-size:12px;color:#9b9690;">(unique, used for session continuity)</span></label>
+        <input class="profile-field-input" type="text" id="pro-username" placeholder="e.g. john_doe" autocomplete="off" autocapitalize="none" spellcheck="false" oninput="profileCheckUsername(this)" />
+        <div class="username-status" id="usernameStatus"></div>
       </div>
     </div>
 
@@ -5871,7 +6770,7 @@ async _sendCurrentFrame() {
     </div>
 
     <button class="profile-btn-primary" onclick="profileSaveAll()">Save &amp; Continue</button>
-    <button class="profile-btn-skip" onclick="profileDismiss()">Skip for now</button>
+    <button class="profile-btn-skip" onclick="profileSkipAttempt()">Skip for now</button>
 
     <div class="profile-home-indicator"></div>
   </div>
@@ -5880,6 +6779,9 @@ async _sendCurrentFrame() {
 
 <script>
   // ── Profile Overlay Logic ──
+  var _usernameValid = false;
+  var _usernameCheckTimer = null;
+
   function profileShowToast(msg) {
     var t = document.getElementById('profileToast');
     t.textContent = msg;
@@ -5893,41 +6795,133 @@ async _sendCurrentFrame() {
     setTimeout(function() { el.style.display = 'none'; }, 420);
   }
 
+  // Skip only allowed if name already saved
+  function profileSkipAttempt() {
+    var saved = JSON.parse(localStorage.getItem('user_persona') || '{}');
+    if (saved.fullname) { profileDismiss(); return; }
+    profileShowToast('Please enter your name to continue');
+    document.getElementById('pro-fullname').focus();
+  }
+
+  // Real-time username uniqueness checker against new Supabase
+  window.profileCheckUsername = function(input) {
+    var val = input.value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+    input.value = val; // sanitize in-place
+    var statusEl = document.getElementById('usernameStatus');
+    _usernameValid = false;
+    clearTimeout(_usernameCheckTimer);
+
+    if (!val) { statusEl.textContent = ''; statusEl.className = 'username-status'; input.className = 'profile-field-input'; return; }
+    if (val.length < 3) {
+      statusEl.textContent = 'At least 3 characters required';
+      statusEl.className = 'username-status err';
+      input.className = 'profile-field-input username-err';
+      return;
+    }
+
+    statusEl.textContent = 'Checking availability…';
+    statusEl.className = 'username-status checking';
+    input.className = 'profile-field-input username-checking';
+
+    _usernameCheckTimer = setTimeout(async function() {
+      if (!window.supabaseContinue) {
+        // New Supabase not yet init'd — just mark valid locally
+        _usernameValid = true;
+        statusEl.textContent = '✓ Looks good!';
+        statusEl.className = 'username-status ok';
+        input.className = 'profile-field-input username-ok';
+        return;
+      }
+      try {
+        var currentSaved = localStorage.getItem('madeonic_username');
+        if (currentSaved === val) {
+          // Same as already registered username - it's this user's own
+          _usernameValid = true;
+          statusEl.textContent = '✓ Your username';
+          statusEl.className = 'username-status ok';
+          input.className = 'profile-field-input username-ok';
+          return;
+        }
+        var res = await window.supabaseContinue.from('user_profiles').select('username').eq('username', val).maybeSingle();
+        if (res.data) {
+          _usernameValid = false;
+          statusEl.textContent = '✗ Username already taken';
+          statusEl.className = 'username-status err';
+          input.className = 'profile-field-input username-err';
+        } else {
+          _usernameValid = true;
+          statusEl.textContent = '✓ Available!';
+          statusEl.className = 'username-status ok';
+          input.className = 'profile-field-input username-ok';
+        }
+      } catch(e) {
+        // Network error — allow save
+        _usernameValid = true;
+        statusEl.textContent = '✓ Looks good!';
+        statusEl.className = 'username-status ok';
+        input.className = 'profile-field-input username-ok';
+      }
+    }, 600);
+  };
+
   function profileSaveAll() {
     var name     = document.getElementById('pro-fullname').value.trim();
     var nick     = document.getElementById('pro-callname').value.trim();
+    var username = document.getElementById('pro-username').value.trim().toLowerCase();
     var prefs    = document.getElementById('pro-prefs').value.trim();
     var about    = document.getElementById('pro-aboutme').value.trim();
     var jobtitle = document.getElementById('pro-jobtitle').value.trim();
     var industry = document.getElementById('pro-industry').value.trim();
     var company  = document.getElementById('pro-company').value.trim();
 
-    if (!name && !nick) {
-      profileShowToast('Enter at least your name to continue');
+    // ── Name is required ──
+    if (!name) {
+      profileShowToast('Full name is required to continue');
+      document.getElementById('pro-fullname').focus();
+      document.getElementById('pro-fullname').style.boxShadow = '0 0 0 2px rgba(239,68,68,0.5)';
+      setTimeout(function() { document.getElementById('pro-fullname').style.boxShadow = ''; }, 2000);
       return;
     }
 
-    // Build job string
+    // ── Username is required and must be valid ──
+    if (!username || username.length < 3) {
+      profileShowToast('Choose a username (min 3 characters)');
+      document.getElementById('pro-username').focus();
+      return;
+    }
+    if (!_usernameValid) {
+      profileShowToast('Username is taken or invalid. Please choose another.');
+      document.getElementById('pro-username').focus();
+      return;
+    }
+
     var jobParts = [jobtitle, industry, company].filter(Boolean);
     var jobStr = jobParts.join(' · ');
-
-    // Build instructions from prefs
-    var instrStr = prefs;
-
     var persona = {
       name:  nick || name,
       job:   jobStr,
       about: about,
-      instr: instrStr,
+      instr: prefs,
       nick:  nick,
       fullname: name,
+      username: username,
       industry: industry,
       company: company
     };
     localStorage.setItem('user_persona', JSON.stringify(persona));
     localStorage.setItem('madeonic_profile_done', '1');
+    localStorage.setItem('madeonic_username', username);
 
-    // Sync into the settings panel fields if the app is loaded
+    // Register username in new Supabase (upsert)
+    (async function() {
+      if (window.supabaseContinue) {
+        try {
+          await window.supabaseContinue.from('user_profiles').upsert([{ username: username, full_name: name, created_at: new Date().toISOString() }], { onConflict: 'username' });
+        } catch(e) { console.log('Username register error:', e); }
+      }
+    })();
+
+    // Sync settings panel
     try {
       var pName  = document.getElementById('p-name');
       var pJob   = document.getElementById('p-job');
@@ -5937,10 +6931,7 @@ async _sendCurrentFrame() {
       if (pJob)   pJob.value   = persona.job;
       if (pAbout) pAbout.value = persona.about;
       if (pInstr) pInstr.value = persona.instr;
-      // Trigger app persona save if app is ready
-      if (window.app && typeof window.app.savePersona === 'function') {
-        window.app.savePersona();
-      }
+      if (window.app && typeof window.app.savePersona === 'function') window.app.savePersona();
     } catch(e) {}
 
     profileShowToast('Profile saved — welcome, ' + (nick || name) + '!');
@@ -5948,13 +6939,20 @@ async _sendCurrentFrame() {
   }
 
   function profileOpenOverlay() {
-    // Pre-fill from existing localStorage data
     var saved = JSON.parse(localStorage.getItem('user_persona') || '{}');
     if (saved.fullname) document.getElementById('pro-fullname').value = saved.fullname;
     if (saved.nick)     document.getElementById('pro-callname').value  = saved.nick;
+    if (saved.username) {
+      var uEl = document.getElementById('pro-username');
+      uEl.value = saved.username;
+      _usernameValid = true;
+      var st = document.getElementById('usernameStatus');
+      st.textContent = '✓ Your username';
+      st.className = 'username-status ok';
+      uEl.className = 'profile-field-input username-ok';
+    }
     if (saved.instr)    document.getElementById('pro-prefs').value     = saved.instr;
     if (saved.about)    document.getElementById('pro-aboutme').value   = saved.about;
-    // Parse job back
     if (saved.job) {
       var parts = saved.job.split(' · ');
       if (parts[0]) document.getElementById('pro-jobtitle').value  = parts[0];
@@ -5966,15 +6964,16 @@ async _sendCurrentFrame() {
     el.classList.remove('hidden');
   }
 
-  // ── Auto-show for first-time users ──
+  // ── Auto-show: new users always, existing users if missing username ──
   (function() {
-    var done = localStorage.getItem('madeonic_profile_done');
-    if (!done) {
-      // Small delay so the main app paints first
+    var done     = localStorage.getItem('madeonic_profile_done');
+    var username = localStorage.getItem('madeonic_username');
+    var el       = document.getElementById('profileOverlay');
+
+    if (!done || !username) {
+      // New user OR existing user who hasn't set a username yet — show overlay
       setTimeout(profileOpenOverlay, 300);
     } else {
-      // Already completed — hide immediately without animation
-      var el = document.getElementById('profileOverlay');
       el.style.display = 'none';
     }
   })();
