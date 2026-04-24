@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Madeonic V3</title>
+  <title>Madeonic Live</title>
   <!-- Background Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Favicons -->
@@ -2150,6 +2150,67 @@ body {
       flex-shrink: 0;
     }
 
+    /* ── Crash / Error Toast ── */
+    #crashToast {
+      position: fixed;
+      bottom: 104px; /* Perfectly aligned above the bottom toolbar */
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      z-index: 205;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.34,1.56,0.64,1), transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #crashToast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: all;
+    }
+    .crash-skin {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #fff8f3;
+      border: 1px solid #fce3ce;
+      border-radius: 100px;
+      padding: 10px 18px;
+      box-shadow: 0 4px 24px rgba(234, 88, 12, 0.12);
+      width: 90vw;
+      max-width: 360px;
+    }
+    .crash-icon {
+      color: #e06c2b;
+      font-size: 24px;
+      display: flex;
+      flex-shrink: 0;
+    }
+    .crash-text {
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.95rem, 4vw, 1.05rem);
+      font-weight: 500;
+      color: #d06020;
+      line-height: 1.35;
+      flex: 1;
+    }
+    .crash-refresh {
+      background: none;
+      border: none;
+      color: #e06c2b;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin-left: 4px;
+      transition: transform 0.3s ease;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .crash-refresh:active {
+      transform: rotate(90deg) scale(0.9);
+    }
+
     /* ── Generation Action Bar ── */
     .ai-actions {
       display: flex;
@@ -2715,6 +2776,17 @@ body {
     </div>
   </div>
 
+  <!-- ── Error/Crash Toast ── -->
+  <div id="crashToast">
+    <div class="crash-skin" role="alert">
+      <div class="crash-icon"><i class="ph-bold ph-info"></i></div>
+      <div class="crash-text">Hmm... something seems to<br>have gone wrong.</div>
+      <button class="crash-refresh" aria-label="Fresh Reconnect" title="Refresh connection" onclick="document.getElementById('crashToast').classList.remove('visible'); if(window.app) window.app.clearConversation();">
+        <i class="ph-bold ph-arrows-clockwise"></i>
+      </button>
+    </div>
+  </div>
+
 </div><!-- /#mainScreen -->
 
 <!-- ── Session Limit Toast (7.5 min) ── -->
@@ -2943,6 +3015,7 @@ body {
   var _connected = false;
   var _sessionStart = null;
   var _firstMessage = true; // Track first transcript entry
+  var _isLinking = false;
 
   var uiMicBtn    = document.getElementById('uiMicBtn');
   var uiCamBtn    = document.getElementById('uiCamBtn');
@@ -2982,11 +3055,96 @@ body {
         '<div class="stop-wave"><span></span><span></span><span></span><span></span><span></span></div>Stop';
     } else {
       uiConnBtn.className = 'stop-connect-btn state-connect';
-      uiConnBtn.innerHTML = '<i class="ph-bold ph-plug-charging" style="font-size:17px;"></i>Connect';
+      if (_isLinking) {
+        uiConnBtn.innerHTML = '<i class="ph-bold ph-plug-charging" style="font-size:17px; opacity:0.8;"></i><span>Linking</span>';
+      } else {
+        uiConnBtn.innerHTML = '<i class="ph-bold ph-plug-charging" style="font-size:17px;"></i><span>Connect</span>';
+      }
     }
     // Re-evaluate send-swap in case text is present
     _refreshConnectOrSend();
   }
+
+  // ── Error Toast Visibility ──
+  window.showCrashToast = function() {
+    var ct = document.getElementById('crashToast');
+    if (ct && !ct.classList.contains('visible')) {
+      ct.classList.add('visible');
+      clearTimeout(window._crashToastTimer);
+      window._crashToastTimer = setTimeout(function() { ct.classList.remove('visible'); }, 8000);
+    }
+  };
+
+  // ── Core Smart Connectivity Engine ──
+  window.triggerSmartConnect = function(pendingText) {
+    var btn = document.getElementById('uiConnectBtn');
+    if (!btn.classList.contains('state-send')) {
+      btn.innerHTML = '<i class="ph-bold ph-plug-charging" style="font-size:17px; opacity:0.8;"></i><span>Linking</span>';
+    }
+
+    var app = window.app;
+    if (app) {
+      var conditions = JSON.parse(localStorage.getItem('madeonic_continue_conditions') || '{}');
+      var canNative = conditions.canNative !== false;
+      
+      // 🛡️ Condition Check: Natively dead or special context required?
+      if (!app.canNativeResume || !canNative || app._isSpecialContextMode()) {
+        app.resumeHandle = ""; // Atomic kill of Gemini session ID
+        localStorage.removeItem('madeonic_session_handle');
+
+        var localCtx = null;
+        try { localCtx = JSON.parse(localStorage.getItem('madeonic_continue_context') || 'null'); } catch(e) {}
+        
+        var lines =["=== PREVIOUS SESSION CONTEXT ==="];
+        var hasRounds = false;
+
+        // 🧠 Retrieve memories perfectly, locally, instantly
+        if (app.continueRoundLog && app.continueRoundLog.length > 0) {
+          app.continueRoundLog.forEach(function(r) {
+            lines.push("[Round " + r.round + "]\nUser: " + (r.q || "") + "\nAssistant: " + (r.a || "") + "\n");
+          });
+          hasRounds = true;
+        } else if (localCtx && localCtx.rounds && localCtx.rounds.length > 0) {
+          localCtx.rounds.forEach(function(r) {
+            lines.push("[Round " + r.round + "]\nUser: " + (r.q || "") + "\nAssistant: " + (r.a || "") + "\n");
+          });
+          hasRounds = true;
+        }
+
+        if (hasRounds) {
+          lines.push("=== END OF PREVIOUS SESSION ===");
+          app.continueContextFromDB = lines.join("\n");
+        }
+
+        // Reset tracking vars for the new extension session
+        app.continueRoundLog =[];
+        app.canNativeResume = true;
+        app.sessionStartTimestamp = null;
+        app.continueSessionId = 'cs_' + Date.now();
+        localStorage.setItem('madeonic_continue_session_id', app.continueSessionId);
+        localStorage.removeItem('madeonic_continue_conditions');
+      }
+    }
+
+    // Trigger physical connection
+    document.getElementById('connectBtn').click();
+    if (typeof dismissConnectHint === 'function') dismissConnectHint();
+    if (typeof closePanel === 'function') closePanel();
+
+    if (pendingText) {
+      var onceConn = function() {
+        window.removeEventListener('app-ws-connected', onceConn);
+        var attempts = 0;
+        var poll = setInterval(function() {
+          if (window.app && window.app.setupComplete) {
+            clearInterval(poll);
+            if (window.madeonicSendText) window.madeonicSendText(pendingText);
+          } else if (++attempts > 40) clearInterval(poll);
+        }, 100);
+      };
+      window.addEventListener('app-ws-connected', onceConn);
+    }
+  };
 
   // ── Send-arrow swap: show ➜ arrow when text is present ──
   var _prevConnState = null; // 'state-connect' | 'state-stop'
@@ -3024,7 +3182,11 @@ body {
         '<div class="stop-wave"><span></span><span></span><span></span><span></span><span></span></div>Stop';
     } else {
       uiConnBtn.className = 'stop-connect-btn state-connect';
-      uiConnBtn.innerHTML = '<i class="ph-bold ph-plug-charging" style="font-size:17px;"></i>Connect';
+      if (_isLinking) {
+        uiConnBtn.innerHTML = '<i class="ph-bold ph-plug-charging" style="font-size:17px; opacity:0.8;"></i><span>Linking</span>';
+      } else {
+        uiConnBtn.innerHTML = '<i class="ph-bold ph-plug-charging" style="font-size:17px;"></i><span>Connect</span>';
+      }
     }
   }
 
@@ -3040,19 +3202,7 @@ body {
       document.body.classList.add('chat-active'); // ensure transcript shows
       if (!_connected) {
         _sessionStart = Date.now();
-        document.getElementById('connectBtn').click();
-        dismissConnectHint();
-        var pendingText = text;
-        window.addEventListener('app-ws-connected', function _onceConn() {
-          window.removeEventListener('app-ws-connected', _onceConn);
-          var attempts = 0;
-          var poll = setInterval(function() {
-            if (window.app && window.app.setupComplete) {
-              clearInterval(poll);
-              madeonicSendText(pendingText);
-            } else if (++attempts > 40) clearInterval(poll);
-          }, 100);
-        });
+        window.triggerSmartConnect(text);
       } else {
         madeonicSendText(text);
       }
@@ -3062,9 +3212,7 @@ body {
     // ── Normal connect / stop ──
     if (!_connected) {
       _sessionStart = Date.now();
-      document.getElementById('connectBtn').click();
-      dismissConnectHint();
-      closePanel();
+      window.triggerSmartConnect();
     } else {
       document.getElementById('disconnectBtn').click();
       var toast = document.getElementById('disconnectToast');
@@ -3093,19 +3241,7 @@ body {
       document.body.classList.add('chat-active');
       if (!_connected) {
         _sessionStart = Date.now();
-        document.getElementById('connectBtn').click();
-        dismissConnectHint();
-        var pendingText = text;
-        window.addEventListener('app-ws-connected', function _onceConnected() {
-          window.removeEventListener('app-ws-connected', _onceConnected);
-          var attempts = 0;
-          var poll = setInterval(function() {
-            if (window.app && window.app.setupComplete) {
-              clearInterval(poll);
-              madeonicSendText(pendingText);
-            } else if (++attempts > 40) clearInterval(poll);
-          }, 100);
-        });
+        window.triggerSmartConnect(text);
         return;
       }
       madeonicSendText(text);
@@ -3124,7 +3260,13 @@ body {
   };
 
   // ── Auto-connect events ──
+  window.addEventListener('app-connecting', function() {
+    _isLinking = true;
+    setConnectBtnState(_connected);
+  });
+
   window.addEventListener('app-ws-connected', function() {
+    _isLinking = false;
     uiMicBtn.disabled    = false;
     uiCamBtn.disabled    = false;
     uiUploadBtn.disabled = false;
@@ -3150,6 +3292,7 @@ body {
   };
 
   window.addEventListener('app-reset-ui', function() {
+    _isLinking = false;
     if (_micOn) { _micOn = false; uiMicBtn.classList.remove('mic-on'); document.getElementById('micBtnIcon').className = 'ph-bold ph-microphone'; }
     if (_camOn) { _camOn = false; uiCamBtn.classList.remove('cam-on'); camPreview.classList.remove('pip-on'); }
     if (_screenOn) {
@@ -4091,6 +4234,7 @@ async uploadFile(file) {
       div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
       els.log.appendChild(div);
       els.log.scrollTop = els.log.scrollHeight;
+      if (cls === "err" && window.showCrashToast) window.showCrashToast();
     }
 
 _setStatus(kind, text) {
@@ -4122,9 +4266,10 @@ _setStatus(kind, text) {
         Elevating: { color: '#f472b6', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773578/rftorpw4x4nkcemokulx.png', pal: ['#fdf2f8','#fce7f3','#fbcfe8','#f9a8d4','#ffffff'] },
         Muted: { color: '#94a3b8', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773580/xhtozvje43ofyalumqjl.png', pal: ['#f8fafc','#f1f5f9','#e2e8f0','#cbd5e1','#ffffff'] },
         // ── New states ──
-        Offline: { color: '#94a3b8', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773580/xhtozvje43ofyalumqjl.png', pal: ['#f8fafc','#f1f5f9','#e8edf5','#dde4ee','#ffffff'] },
-        Ended:   { color: '#f87171', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773580/xhtozvje43ofyalumqjl.png', pal: ['#fff5f5','#fee2e2','#fecaca','#fca5a5','#ffffff'] },
-        GoAhead: { color: '#4ade80', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773580/xhtozvje43ofyalumqjl.png', pal: ['#f0fdf4','#dcfce7','#bbf7d0','#86efac','#ffffff'] }
+        Offline: { color: '#94a3b8', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773580/xhtozvje43ofyalumqjl.png', pal:['#f8fafc','#f1f5f9','#e8edf5','#dde4ee','#ffffff'] },
+        Ended:   { color: '#f87171', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773580/xhtozvje43ofyalumqjl.png', pal:['#fff5f5','#fee2e2','#fecaca','#fca5a5','#ffffff'] },
+        GoAhead: { color: '#4ade80', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773580/xhtozvje43ofyalumqjl.png', pal:['#f0fdf4','#dcfce7','#bbf7d0','#86efac','#ffffff'] },
+        Bridging: { color: '#c084fc', icon: 'https://res.cloudinary.com/dzwx3nq4f/image/upload/v1774773580/xhtozvje43ofyalumqjl.png', pal:['#faf5ff','#f3e8ff','#e9d5ff','#d8b4fe','#ffffff'] }
       };
 
       this.currentPillState = 'Offline';
@@ -4202,8 +4347,10 @@ _setStatus(kind, text) {
         nextState = 'Searching';
       } else if (kind === 'listening') {
         nextState = this.micActive ? 'Listening' : 'Muted';
+      } else if (kind === 'connecting') {
+        nextState = 'Bridging';
       } else if (kind === 'warn') {
-        nextState = 'Muted'; // Connecting/reconnecting
+        nextState = 'Muted'; // General warnings
       } else if (kind === 'bad') {
         nextState = 'Offline';
       } else if (kind === 'on') {
@@ -4276,9 +4423,10 @@ async _parsePdf(file) {
     }
 
     async connect() {
+      window.dispatchEvent(new CustomEvent('app-connecting'));
       // Fetch keys from Vault if not already present
       if (!this.API_KEY || !this.SERPER_API_KEY) {
-        this._setStatus("warn", "Accessing Vault...");
+        this._setStatus("connecting", "Bridging...");
         try {
           const res = await fetch(this.VAULT_URL);
           const config = await res.json();
@@ -4297,7 +4445,7 @@ async _parsePdf(file) {
       this.manualClose = false;
       this.retryCount = 0;
       this._syncUI();
-      this._setStatus("warn", "Connecting…");
+      this._setStatus("connecting", "Linking…");
 
       let url;
       try { url = this._endpoint(); } catch (e) {
@@ -4374,7 +4522,8 @@ async _parsePdf(file) {
         this.setupComplete = false;
         this._log(`Socket closed (${event.code}) ${event.reason || ""}`.trim(), event.code === 1000 ? "sys" : "err");
         if (!this.manualClose) {
-          this._setStatus("warn", "Reconnecting…");
+          this._setStatus("connecting", "Reconnecting…");
+          window.dispatchEvent(new CustomEvent('app-connecting'));
           this._scheduleReconnect();
         } else {
           this._setStatus("ended", "Ended");
@@ -4629,6 +4778,7 @@ async _parsePdf(file) {
             this._log("Searching Places...", "sys");
             try {
               const places = await this._callSerperPlaces(call.args);
+              this.lastSearchResults = places.map(p => ({ title: p.name, url: `https://www.google.com/maps/search/?api=1&query=${p.latitude},${p.longitude}`, snippet: p.address, meta: p.category }));
               this._send({ toolResponse: { functionResponses: [{ name: "places_search", id: call.id, response: { output: places } }] } });
             } catch (err) { this._log("Places search failed", "err"); }
           }
@@ -4989,11 +5139,15 @@ _renderMap(args) {
       const data = await res.json();
       
       if (type === 'videos') {
+        const results = (data.videos || []).map(v => ({ title: v.title, url: v.link, snippet: v.snippet, thumbnail: v.imageUrl }));
+        this.lastSearchResults = results;
         this._renderVideoResults(data.videos || []);
-        return (data.videos || []).map(v => ({ title: v.title, link: v.link, snippet: v.snippet }));
+        return results;
       } else {
+        const results = (data.shopping || []).map(p => ({ title: p.title, url: p.link, price: p.price, snippet: p.source }));
+        this.lastSearchResults = results;
         this._renderProductResults(data.shopping || []);
-        return (data.shopping || []).map(p => ({ title: p.title, price: p.price, source: p.source }));
+        return results;
       }
     }
 
@@ -5422,14 +5576,14 @@ _renderMap(args) {
     _showSourcesFromData(data) {
       const body = document.getElementById('modalBody');
       body.innerHTML = data.map(r => {
-        const snippet = (r.snippets?.[0] || r.description || r.snippet || '');
-        let hostname = 'link';
-        try { hostname = new URL(r.url).hostname; } catch(e){}
+        const snippet = (r.snippets?.[0] || r.description || r.snippet || r.price || '');
+        let hostname = r.meta || 'source';
+        try { if(r.url) hostname = new URL(r.url).hostname; } catch(e){}
         
         return `
           <div class="source-item">
-            <a href="${r.url}" target="_blank" class="source-link">${r.title || 'Untitled Result'}</a>
-            <div class="source-meta">${hostname}</div>
+            <a href="${r.url || '#'}" target="_blank" class="source-link">${r.title || 'Untitled Result'}</a>
+            <div class="source-meta">${hostname.toUpperCase()}</div>
             <div class="source-snippet">${snippet}</div>
           </div>
         `;
@@ -5457,7 +5611,6 @@ _appendTranscript(role, text, isStreaming = false) {
         // AI Logic: Karaoke/Fills-Bolds Effect
         if (isStreaming && this.currentAiMsgEl) {
           const textContainer = this.currentAiMsgEl.querySelector('.text-content');
-          // Move previous 'reading' text to 'past'
           const oldReading = textContainer.querySelector('.reading');
           if (oldReading) oldReading.classList.remove('reading');
           
@@ -5468,8 +5621,17 @@ _appendTranscript(role, text, isStreaming = false) {
         } else {
           const div = document.createElement("div");
           div.className = "msg msg-ai";
+          
+          // 🛡️ Proactive Logic: Generate Sources Button if Search was run
           let sourcesBtn = "";
-          // ... (keep sourcesBtn logic identical)
+          if (this.lastSearchResults && this.lastSearchResults.length > 0) {
+            const dataStr = JSON.stringify(this.lastSearchResults).replace(/'/g, "&apos;");
+            sourcesBtn = `<button class="sources-btn" onclick="app._showSourcesFromData(JSON.parse('${dataStr}'))">
+              <i class="ph-bold ph-list-magnifying-glass"></i> SOURCES
+            </button>`;
+            this.lastSearchResults = null; // Flush so it only attaches to one message
+          }
+
           div.innerHTML = `
             <div class="text-content"><span class="reading">${text}</span></div>
             <div class="ai-actions">
@@ -5553,6 +5715,10 @@ _appendTranscript(role, text, isStreaming = false) {
       clearTimeout(this.retryTimer);
       this.retryCount += 1;
       this._syncUI();
+      
+      // Fire crash toast if reconnects are looping quickly
+      if (this.retryCount >= 3 && window.showCrashToast) window.showCrashToast();
+      
       if (this.retryCount > 8) {
         this._log("Reconnect limit reached.", "err");
         this._setStatus("bad", "Offline");
